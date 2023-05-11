@@ -130,5 +130,55 @@ function(CT_CHECK_VARIABLE VAR)
 	endif()
 endfunction()
 
+function(CT_EXTRACT_MATCHING_STRINGS RET SOURCE_STRING PATTERN)
+	string(REGEX MATCHALL ${PATTERN} matched_strings ${SOURCE_STRING})
+
+	if(NOT matched_strings)
+		CT_THROW_ERROR("No contents matching the pattern were found.")
+	else()
+		set(${RET} ${matched_strings} PARENT_SCOPE)
+	endif()
+endfunction()
+
+function(CT_READ_TEXTFILE RET FILE_PATH)
+	file(READ ${FILE_PATH} file_content)
+	set(${RET} "${file_content}" PARENT_SCOPE)
+	message("The content of ${FILE_PATH} has been read.")
+endfunction()
+
+function(CT_WRITE_TEXTFILE FILE_PATH CONTENTS)
+	file(WRITE ${FILE_PATH} ${CONTENTS})
+	message("The file ${FILE_PATH} has been created.")
+endfunction()
+
+function(CT_CREATE_SUBPROJECT_SPEC_DIRS dir)
+	set(res_dir "${dir}/res")
+	set(src_dir "${dir}/src")
+	set(info_dir "${dir}/info")
+
+	file(MAKE_DIRECTORY ${res_dir})
+	file(MAKE_DIRECTORY ${src_dir})
+	file(MAKE_DIRECTORY ${info_dir})
+
+	message("Directories have been created at ${dir}.")
+endfunction()
+
+function(CT_FIND_TEXTFILES output_list)
+	set(search_dir "${CMAKE_CURRENT_SOURCE_DIR}/Projects")
+	set(glob_expression "${search_dir}/**/*.txt")
+
+	file(GLOB_RECURSE text_files ${glob_expression})
+
+	if(NOT text_files)
+		message("No text files were found in ${search_dir} or its subdirectories.")
+	else()
+		list(APPEND ${output_list} ${text_files})
+		message("The following text files were found:")
+
+		foreach(file ${text_files})
+			message("  ${file}")
+		endforeach()
+	endif()
+endfunction()
 
 # ======================================[Execution Part]======================================
