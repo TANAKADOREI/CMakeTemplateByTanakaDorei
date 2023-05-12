@@ -19,7 +19,13 @@ set(CT "2439075417" CACHE STRING "Cmake Constant Data" FORCE)
 set(CT_CONST_DOCSTRING "Cmake Constant Data" CACHE STRING "Cmake Constant Data" FORCE)
 
 set(CT_CONST_CMAKE_VERSION "3.25" CACHE STRING ${CT_CONST_DOCSTRING} FORCE)
-set(CT_CONST_ROOT_DIR_PATH ${CMAKE_CURRENT_SOURCE_DIR} CACHE STRING ${CT_CONST_DOCSTRING} FORCE)
+set(CT_CONST_CMAKE_DATAFILE "CMakeLists.data.txt" CACHE STRING ${CT_CONST_DOCSTRING} FORCE)
+
+set(CT_CONST_PROJECT_DIR_PATH ${CMAKE_CURRENT_SOURCE_DIR} CACHE STRING ${CT_CONST_DOCSTRING} FORCE)
+set(CT_CONST_PROJECT_SPEC_DIR_PROJECTS "projects" CACHE STRING ${CT_CONST_DOCSTRING} FORCE)
+set(CT_CONST_SUBPROJECT_SPEC_DIR_SRC "src" CACHE STRING ${CT_CONST_DOCSTRING} FORCE)
+set(CT_CONST_SUBPROJECT_SPEC_DIR_RES "res" CACHE STRING ${CT_CONST_DOCSTRING} FORCE)
+set(CT_CONST_SUBPROJECT_SPEC_DIR_INFO "inf" CACHE STRING ${CT_CONST_DOCSTRING} FORCE)
 
 set(CT_CONST_ERROR_TITLE "Error" CACHE STRING ${CT_CONST_DOCSTRING} FORCE)
 
@@ -27,12 +33,16 @@ set(CT_CONST_VARIABLE_TYPE_STRING "<:STRING:>" CACHE STRING ${CT_CONST_DOCSTRING
 set(CT_CONST_VARIABLE_TYPE_LIST "<:LIST:>" CACHE STRING ${CT_CONST_DOCSTRING} FORCE)
 set(CT_CONST_VARIABLE_TYPE_BOOL "<:BOOL:>" CACHE STRING ${CT_CONST_DOCSTRING} FORCE)
 
+set(CT_CONST_CT_LOG_WRITELINE_CHARS "8" CACHE STRING ${CT_CONST_DOCSTRING} FORCE)
+set(CT_CONST_CT_LOG_WRITELINE_HEADER_CHARS "6" CACHE STRING ${CT_CONST_DOCSTRING} FORCE)
+set(CT_CONST_CT_LOG_WRITELINE_FOOTER_CHARS "2" CACHE STRING ${CT_CONST_DOCSTRING} FORCE)
+
 # ======================================[Options]======================================
 # Command-line modification only options
 set(CT_OPTION_DOCSTRING "Command-line modification-only variables" CACHE STRING "Command-line modification-only variables" FORCE)
 
 # Maximum characters per line
-set(CT_OPTION_MAX_CHARS_PER_LINE "160" CACHE STRING ${CT_OPTION_DOCSTRING} FORCE)
+set(CT_OPTION_MAX_CHARS_PER_LINE "20" CACHE STRING ${CT_OPTION_DOCSTRING} FORCE)
 set(CT_OPTION_ELEMENTS_PER_LINE "5" CACHE STRING ${CT_OPTION_DOCSTRING} FORCE)
 
 # ======================================[Cmake Header]======================================
@@ -47,23 +57,44 @@ project(
 )
 
 # ======================================[Cmake Decl Functions]======================================
-function(CT_GET_VARIABLE_TYPE RET VAR)
-	CT_CHECK_VARIABLE(VAR)
 
-	if("${VAR}" STREQUAL "")
-		set(RET ${CT_CONST_VARIABLE_TYPE_STRING})
-	elseif(NOT "${VAR}" STREQUAL "${${VAR}}")
-		set(RET ${CT_CONST_VARIABLE_TYPE_LIST})
-	elseif(VAR)
-		set(RET ${CT_CONST_VARIABLE_TYPE_BOOL})
+function(CT_THROW_ERROR MSG)
+	message(">>>!SYS!<<< --> ${MSG}")
+	message(FATAL_ERROR ">>>!SYS!<<<")
+endfunction()
+
+function(CT_CHECK_VARIABLE VAR)
+	if(DEFINED ${VAR})
+		if(${VAR})
+		# exist
+		else()
+			CT_THROW_ERROR(${CMAKE_CURRENT_FUNCTION} "${VAR} is empty.")
+		endif()
 	else()
-		CT_THROW_ERROR(${CT_CONST_ERROR_TITLE} "Variable type: UNKNOWN")
+		CT_THROW_ERROR("${VAR} is not defined.")
 	endif()
 endfunction()
 
+function(CT_GET_VARIABLE_TYPE RET VAR)
+	CT_CHECK_VARIABLE(${VAR})
+	if("${VAR}" MATCHES ";")
+	set(${RET} ${CT_CONST_VARIABLE_TYPE_LIST} PARENT_SCOPE)
+	elseif("${VAR}" STREQUAL "ON" OR "${VAR}" STREQUAL "OFF" OR
+		"${VAR}" STREQUAL "TRUE" OR "${VAR}" STREQUAL "FALSE")
+		set(${RET} ${CT_CONST_VARIABLE_TYPE_BOOL} PARENT_SCOPE)
+	else()
+	set(${RET} ${CT_CONST_VARIABLE_TYPE_STRING} PARENT_SCOPE)
+	endif()
+endfunction()
+
+list(APPEND temp "A" "B")
+set(res)
+CT_GET_VARIABLE_TYPE(res temp)
+message(${temp})
+
 function(CT_CHECK_VARIABLE_TYPE VAR TYPE)
 	set(RESULT)
-	CT_GET_VARIABLE_TYPE(RESULT VAR)
+	CT_GET_VARIABLE_TYPE(RESULT ${VAR})
 
 	if(${RESULT} STREQUAL ${TYPE})
 	else()
@@ -71,8 +102,42 @@ function(CT_CHECK_VARIABLE_TYPE VAR TYPE)
 	endif()
 endfunction()
 
+
+
+function(CT_TRUNCATE_STRING RET STRING MAX_LENGTH)
+	CT_CHECK_VARIABLE_TYPE(STRING ${CT_CONST_VARIABLE_TYPE_STRING})
+	set(temp)
+	math(EXPR temp "${CT_OPTION_MAX_CHARS_PER_LINE} - ${CT_CONST_CT_LOG_WRITELINE_CHARS}")
+	set(truncated_string "${STRING}" ${temp})
+
+	if(NOT "${truncated_string}" STREQUAL "" AND NOT "${truncated_string}" STREQUAL "..." AND NOT ${MAX_LENGTH} LESS 3)
+		if(NOT ${MAX_LENGTH} LESS "${truncated_string}")
+			set(truncated_string "${STRING}")
+		else()
+			math(EXPR truncate_length "${MAX_LENGTH} - 3")
+			string(SUBSTRING "${STRING}" 0 ${truncate_length} truncated_string)
+			set(truncated_string "${truncated_string}...")
+		endif()
+	endif()
+
+	set(${RET} "${truncated_string}" PARENT_SCOPE)
+	CT_CHECK_VARIABLE_TYPE(RET ${CT_CONST_VARIABLE_TYPE_STRING})
+endfunction()
+
+function(CT_PRINT_BUFFER_PADDING RET STRING)
+	CT_CHECK_VARIABLE_TYPE(STRING ${CT_CONST_VARIABLE_TYPE_STRING})
+	CT_TRUNCATE_STRING(RET STRING "${CT_OPTION_MAX_CHARS_PER_LINE} - ${CT_CONST_CT_LOG_WRITELINE_CHARS}")
+	string(LENGTH ${RET} string_length)
+	math(EXPR padding_length "${CT_OPTION_MAX_CHARS_PER_LINE} - ${string_length}")
+	string(REPEAT " " ${padding_length} padding)
+	set(${RET} "${RET}${padding}" PARENT_SCOPE)
+	CT_CHECK_VARIABLE_TYPE(RET ${CT_CONST_VARIABLE_TYPE_STRING})
+endfunction()
+
 function(CT_LOG_WRITELINE MSG)
-	message("##    ${MSG}")
+	CT_CHECK_VARIABLE_TYPE(MSG ${CT_CONST_VARIABLE_TYPE_STRING})
+	CT_PRINT_BUFFER_PADDING(MSG ${MSG})
+	message("##    ${MSG}##")
 endfunction()
 
 function(CT_LOG_WRITELINE_PARTITION)
@@ -85,12 +150,6 @@ function(CT_LOG_WRITELINE_PARTITION)
 	message("${temp}")
 endfunction()
 
-function(CT_THROW_ERROR TITLE MSG)
-	CT_SYSLOG_WRITELINE(${TITLE})
-	CT_LOG_WRITELINE(${MSG})
-	message(FATAL_ERROR)
-endfunction()
-
 function(CT_LOG_WRITELINE_LIST VAR_LIST)
 	set(index 0)
 	set(line "")
@@ -101,7 +160,7 @@ function(CT_LOG_WRITELINE_LIST VAR_LIST)
 		set(truncated_item)
 
 		set(result)
-		math(EXPR result "((${CT_OPTION_MAX_CHARS_PER_LINE} - 6)/${CT_OPTION_ELEMENTS_PER_LINE}) - (${CT_OPTION_ELEMENTS_PER_LINE} * 2)")
+		math(EXPR result "((${CT_OPTION_MAX_CHARS_PER_LINE} - ${CT_CONST_CT_LOG_WRITELINE_CHARS})/${CT_OPTION_ELEMENTS_PER_LINE}) - (${CT_OPTION_ELEMENTS_PER_LINE} * 2)")
 		CT_TRUNCATE_STRING(truncated_item "${item}" ${result})
 
 		set(line "${line}|${truncated_item}|")
@@ -118,18 +177,6 @@ function(CT_LOG_WRITELINE_LIST VAR_LIST)
 	endforeach()
 endfunction()
 
-function(CT_CHECK_VARIABLE VAR)
-	if(DEFINED ${VAR})
-		if(${VAR})
-		# exist
-		else()
-			CT_THROW_ERROR(${CMAKE_CURRENT_FUNCTION} "${VAR} is empty.")
-		endif()
-	else()
-		CT_THROW_ERROR(${CMAKE_CURRENT_FUNCTION} "${VAR} is not defined.")
-	endif()
-endfunction()
-
 function(CT_EXTRACT_MATCHING_STRINGS RET SOURCE_STRING PATTERN)
 	string(REGEX MATCHALL ${PATTERN} matched_strings ${SOURCE_STRING})
 
@@ -143,24 +190,61 @@ endfunction()
 function(CT_READ_TEXTFILE RET FILE_PATH)
 	file(READ ${FILE_PATH} file_content)
 	set(${RET} "${file_content}" PARENT_SCOPE)
-	message("The content of ${FILE_PATH} has been read.")
+	CT_LOG_WRITELINE("The content of ${FILE_PATH} has been read.")
 endfunction()
 
 function(CT_WRITE_TEXTFILE FILE_PATH CONTENTS)
 	file(WRITE ${FILE_PATH} ${CONTENTS})
-	message("The file ${FILE_PATH} has been created.")
+	CT_LOG_WRITELINE("The file ${FILE_PATH} has been created.")
 endfunction()
 
-function(CT_CREATE_SUBPROJECT_SPEC_DIRS dir)
-	set(res_dir "${dir}/res")
-	set(src_dir "${dir}/src")
-	set(info_dir "${dir}/info")
+function(CT_EXISTS_DIR RET DIR_PATH)
+	if(EXISTS "${DIR_PATH}")
+		set(${RET} TRUE PARENT_SCOPE)
+	else()
+		set(${RET} FALSE PARENT_SCOPE)
+	endif()
+endfunction()
 
-	file(MAKE_DIRECTORY ${res_dir})
-	file(MAKE_DIRECTORY ${src_dir})
-	file(MAKE_DIRECTORY ${info_dir})
+function(CT_IF_EXISTS_DIR_THROW DIR_PATH)
+	set(ret)
+	CT_EXISTS_DIR(ret ${DIR_PATH})
 
-	message("Directories have been created at ${dir}.")
+	if(${RET})
+		CT_THROW_ERROR(${CT_CONST_ERROR_TITLE} "Directory `${DIR_PATH}` already exists")
+	endif()
+endfunction()
+
+function(CT_NIF_EXISTS_DIR_THROW DIR_PATH)
+	set(ret)
+	CT_EXISTS_DIR(ret ${DIR_PATH})
+
+	if(NOT ${RET})
+		CT_THROW_ERROR(${CT_CONST_ERROR_TITLE} "Directory `${DIR_PATH}` already exists")
+	endif()
+endfunction()
+
+function(CT_CREATE_PROJECT NAME)
+	set(path "${CT_CONST_PROJECT_DIR_PATH}/${NAME}")
+	CT_IF_EXISTS_DIR_THROW(${path})
+	file(MAKE_DIRECTORY ${path})
+	file(MAKE_DIRECTORY "${path}/${CT_CONST_PROJECT_SPEC_DIR_PROJECTS}")
+	CT_WRITE_TEXTFILE("${CT_CONST_PROJECT_DIR_PATH}/${CT_CONST_CMAKE_DATAFILE}" "${NAME}")
+endfunction()
+
+function(CT_GET_PROJECT_NAME RET)
+	CT_READ_TEXTFILE(${RET} "${CT_CONST_PROJECT_DIR_PATH}/${CT_CONST_CMAKE_DATAFILE}")
+endfunction()
+
+function(CT_CREATE_SUBPROJECT NAME)
+	set(project_name)
+	CT_GET_PROJECT_NAME(project_name)
+	set(path "${project_name}/${NAME}")
+	CT_IF_EXISTS_DIR_THROW(${path})
+	file(MAKE_DIRECTORY "${path}")
+	file(MAKE_DIRECTORY "${path}/${CT_CONST_SUBPROJECT_SPEC_DIR_SRC}")
+	file(MAKE_DIRECTORY "${path}/${CT_CONST_SUBPROJECT_SPEC_DIR_RES}")
+	file(MAKE_DIRECTORY "${path}/${CT_CONST_SUBPROJECT_SPEC_DIR_INF}")
 endfunction()
 
 function(CT_FIND_TEXTFILES output_list)
@@ -170,15 +254,26 @@ function(CT_FIND_TEXTFILES output_list)
 	file(GLOB_RECURSE text_files ${glob_expression})
 
 	if(NOT text_files)
-		message("No text files were found in ${search_dir} or its subdirectories.")
+		CT_LOG_WRITELINE("No text files were found in ${search_dir} or its subdirectories.")
 	else()
 		list(APPEND ${output_list} ${text_files})
-		message("The following text files were found:")
+		CT_LOG_WRITELINE("The following text files were found:")
 
 		foreach(file ${text_files})
-			message("  ${file}")
+			CT_LOG_WRITELINE("  ${file}")
 		endforeach()
 	endif()
 endfunction()
 
 # ======================================[Execution Part]======================================
+# CT_CREATE_PROJECT("MyProject")
+function(PASS2 VAR_2)
+	message(${VAR_2})
+endfunction()
+
+function(PASS1 VAR_1)
+	PASS2(${VAR_1})
+endfunction()
+
+set(VAR_0 "VAR DATA")
+PASS1(VAR_0)
