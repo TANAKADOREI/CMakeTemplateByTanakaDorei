@@ -22,9 +22,6 @@ set(CT_CONST_CMAKE_VERSION "3.25" CACHE STRING ${CT_CONST_DOCSTRING} FORCE)
 set(CT_CONST_CMAKE_DATAFILE "CMakeLists.datatext" CACHE STRING ${CT_CONST_DOCSTRING} FORCE)
 
 set(CT_CONST_CUR_SCRIPT_PATH ${CMAKE_CURRENT_SOURCE_DIR} CACHE STRING ${CT_CONST_DOCSTRING} FORCE)
-set(CT_CONST_PROJECT_SPEC_DIR_SUBPROJECTS "subprojects" CACHE STRING ${CT_CONST_DOCSTRING} FORCE)
-# projects dependency tree directory
-set(CT_CONST_PROJECT_SPEC_DIR_TREE "tree" CACHE STRING ${CT_CONST_DOCSTRING} FORCE)
 set(CT_CONST_SUBPROJECT_SPEC_DIR_SRC "src" CACHE STRING ${CT_CONST_DOCSTRING} FORCE)
 set(CT_CONST_SUBPROJECT_SPEC_DIR_RES "res" CACHE STRING ${CT_CONST_DOCSTRING} FORCE)
 set(CT_CONST_SUBPROJECT_SPEC_DIR_INFO "inf" CACHE STRING ${CT_CONST_DOCSTRING} FORCE)
@@ -44,7 +41,7 @@ set(CT_OPTION_DOCSTRING "Command-line modification-only variables" CACHE STRING 
 # Maximum characters per line
 set(CT_OPTION_MAX_CHARS_PER_LINE "100" CACHE STRING ${CT_OPTION_DOCSTRING} FORCE)
 set(CT_OPTION_ELEMENTS_PER_LINE "4" CACHE STRING ${CT_OPTION_DOCSTRING} FORCE)
-set(CT_OPTION_INNER_TESTER_SET_ENABLE TRUE CACHE BOOL ${CT_OPTION_DOCSTRING} FORCE)
+set(CT_OPTION_INNER_TESTER_SET_ENABLE FALSE CACHE BOOL ${CT_OPTION_DOCSTRING} FORCE)
 
 # ======================================[Cmake Header]======================================
 cmake_minimum_required(VERSION ${CT_CONST_CMAKE_VERSION})
@@ -80,10 +77,9 @@ endfunction()
 
 # testertestertestertestertestertestertestertestertestertester
 # ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-set(ct_function_tester_parameter0 "123456789012345678901234567890")
-CT_CHECK_VARIABLE(ct_function_tester_parameter0)
-
 if(${CT_OPTION_INNER_TESTER_SET_ENABLE})
+	set(ct_function_tester_parameter0 "123456789012345678901234567890")
+	CT_CHECK_VARIABLE(ct_function_tester_parameter0)
 	message("[TESTER] : CT_CHECK_VARIABLE(ct_function_tester_parameter0)")
 endif()
 
@@ -109,19 +105,19 @@ endfunction()
 
 # testertestertestertestertestertestertestertestertestertester
 # ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-set(ct_function_tester_parameter0 "123456789012345678901234567890")
-set(ct_function_tester_return_value)
-CT_TRUNCATE_STRING(ct_function_tester_return_value ${ct_function_tester_parameter0} "10")
-
 if(${CT_OPTION_INNER_TESTER_SET_ENABLE})
+	set(ct_function_tester_parameter0 "123456789012345678901234567890")
+	set(ct_function_tester_return_value)
+	CT_TRUNCATE_STRING(ct_function_tester_return_value ${ct_function_tester_parameter0} "10")
+
 	message("[TESTER] : ${ct_function_tester_return_value} = CT_TRUNCATE_STRING(ct_function_tester_return_value ${ct_function_tester_parameter0} \"10\")")
 endif()
 
-set(ct_function_tester_parameter0 "123")
-set(ct_function_tester_return_value)
-CT_TRUNCATE_STRING(ct_function_tester_return_value ${ct_function_tester_parameter0} "10")
-
 if(${CT_OPTION_INNER_TESTER_SET_ENABLE})
+	set(ct_function_tester_parameter0 "123")
+	set(ct_function_tester_return_value)
+	CT_TRUNCATE_STRING(ct_function_tester_return_value ${ct_function_tester_parameter0} "10")
+
 	message("[TESTER] : ${ct_function_tester_return_value} = CT_TRUNCATE_STRING(ct_function_tester_return_value ${ct_function_tester_parameter0} \"10\")")
 endif()
 
@@ -149,11 +145,11 @@ endfunction()
 
 # testertestertestertestertestertestertestertestertestertester
 # ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-set(ct_function_tester_parameter0 "1234")
-set(ct_function_tester_return_value)
-CT_STRING_BACK_PADDING(ct_function_tester_return_value ${ct_function_tester_parameter0} "10")
-
 if(${CT_OPTION_INNER_TESTER_SET_ENABLE})
+	set(ct_function_tester_parameter0 "1234")
+	set(ct_function_tester_return_value)
+	CT_STRING_BACK_PADDING(ct_function_tester_return_value ${ct_function_tester_parameter0} "10")
+
 	message("[TESTER] : ${ct_function_tester_return_value} = CT_STRING_BACK_PADDING(ct_function_tester_return_value ${ct_function_tester_parameter0} \"10\")")
 endif()
 
@@ -169,11 +165,11 @@ endfunction()
 
 # testertestertestertestertestertestertestertestertestertester
 # ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-set(ct_function_tester_parameter0 "1234")
-set(ct_function_tester_return_value)
-CT_WRITELINE_MSG_AUTO_PADDING(ct_function_tester_return_value ${ct_function_tester_parameter0})
-
 if(${CT_OPTION_INNER_TESTER_SET_ENABLE})
+	set(ct_function_tester_parameter0 "1234")
+	set(ct_function_tester_return_value)
+	CT_WRITELINE_MSG_AUTO_PADDING(ct_function_tester_return_value ${ct_function_tester_parameter0})
+
 	message("[TESTER] : ${ct_function_tester_return_value} = CT_WRITELINE_MSG_AUTO_PADDING(ct_function_tester_return_value ${ct_function_tester_parameter0})")
 endif()
 
@@ -188,10 +184,10 @@ endfunction()
 
 # testertestertestertestertestertestertestertestertestertester
 # ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-set(ct_function_tester_parameter0 "1234")
-CT_LOG_WRITELINE(${ct_function_tester_parameter0})
-
 if(${CT_OPTION_INNER_TESTER_SET_ENABLE})
+	set(ct_function_tester_parameter0 "1234")
+	CT_LOG_WRITELINE(${ct_function_tester_parameter0})
+
 	message("[TESTER] : CT_LOG_WRITELINE(${ct_function_tester_parameter0})")
 endif()
 
@@ -209,14 +205,25 @@ function(CT_LOG_WRITELINE_PARTITION)
 	message("${temp}")
 endfunction()
 
+#
+function(CT_LOG_WRITELINE_THIN_PARTITION)
+	set(temp "##")
+
+	foreach(index RANGE 5 ${CT_OPTION_MAX_CHARS_PER_LINE})
+		set(temp "${temp}-")
+	endforeach()
+
+	message("${temp}##")
+endfunction()
+
 # testertestertestertestertestertestertestertestertestertester
 # ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-set(ct_function_tester_parameter0 "1234")
-CT_LOG_WRITELINE_PARTITION()
-CT_LOG_WRITELINE(${ct_function_tester_parameter0})
-CT_LOG_WRITELINE_PARTITION()
-
 if(${CT_OPTION_INNER_TESTER_SET_ENABLE})
+	set(ct_function_tester_parameter0 "1234")
+	CT_LOG_WRITELINE_PARTITION()
+	CT_LOG_WRITELINE(${ct_function_tester_parameter0})
+	CT_LOG_WRITELINE_PARTITION()
+
 	message("[TESTER] : CT_LOG_WRITELINE_PARTITION()
 	CT_LOG_WRITELINE(${ct_function_tester_parameter0})
 	CT_LOG_WRITELINE_PARTITION()")
@@ -261,12 +268,12 @@ endfunction()
 
 # testertestertestertestertestertestertestertestertestertester
 # ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-set(ct_function_tester_parameter0 "11234" "212341234" "3123412341234" "41234123412341234" "512341234123412341234" "6123412341234123412341234" "71234123412341234123412341234" "11234" "212341234" "3123412341234" "41234123412341234" "512341234123412341234" "6123412341234123412341234" "71234123412341234123412341234")
-CT_LOG_WRITELINE_PARTITION()
-CT_LOG_WRITELINE_LIST(ct_function_tester_parameter0)
-CT_LOG_WRITELINE_PARTITION()
-
 if(${CT_OPTION_INNER_TESTER_SET_ENABLE})
+	set(ct_function_tester_parameter0 "11234" "212341234" "3123412341234" "41234123412341234" "512341234123412341234" "6123412341234123412341234" "71234123412341234123412341234" "11234" "212341234" "3123412341234" "41234123412341234" "512341234123412341234" "6123412341234123412341234" "71234123412341234123412341234")
+	CT_LOG_WRITELINE_PARTITION()
+	CT_LOG_WRITELINE_LIST(ct_function_tester_parameter0)
+	CT_LOG_WRITELINE_PARTITION()
+
 	message("[TESTER] : CT_LOG_WRITELINE_LIST(ct_function_tester_parameter0)")
 endif()
 
@@ -274,32 +281,19 @@ endif()
 # testertestertestertestertestertestertestertestertestertester
 
 #
-function(CT_EXTRACT_MATCHING_STRINGS RET STRING PATTERN)
-	string(REGEX MATCHALL ${PATTERN} matched_strings ${STRING})
-
-	if(NOT matched_strings)
-		CT_THROW_ERROR("No contents matching the pattern were found.")
-	else()
-		set(${RET} ${matched_strings} PARENT_SCOPE)
-	endif()
-endfunction()
-
-#
 function(CT_READ_TEXTFILE RET FILE_PATH)
 	file(READ ${FILE_PATH} file_content)
 	set(${RET} "${file_content}" PARENT_SCOPE)
-	CT_LOG_WRITELINE("The content of ${FILE_PATH} has been read.")
 endfunction()
 
 #
 function(CT_WRITE_TEXTFILE FILE_PATH CONTENTS)
 	file(WRITE ${FILE_PATH} ${CONTENTS})
-	CT_LOG_WRITELINE("The file ${FILE_PATH} has been created.")
 endfunction()
 
 #
-function(CT_EXISTS_DIR RET DIR_PATH)
-	if(EXISTS "${DIR_PATH}")
+function(CT_EXISTS RET PATH)
+	if(EXISTS "${PATH}")
 		set(${RET} TRUE PARENT_SCOPE)
 	else()
 		set(${RET} FALSE PARENT_SCOPE)
@@ -307,79 +301,87 @@ function(CT_EXISTS_DIR RET DIR_PATH)
 endfunction()
 
 #
-function(CT_IF_EXISTS_DIR_THROW DIR_PATH)
+function(CT_IF_EXISTS_DIR_THROW PATH)
 	set(ret)
-	CT_EXISTS_DIR(ret ${DIR_PATH})
+	CT_EXISTS(ret ${PATH})
 
 	if(${RET})
-		CT_THROW_ERROR(${CT_CONST_ERROR_TITLE} "Directory `${DIR_PATH}` already exists")
+		CT_THROW_ERROR(${CT_CONST_ERROR_TITLE} "Directory `${PATH}` already exists")
 	endif()
 endfunction()
 
 #
-function(CT_NIF_EXISTS_DIR_THROW DIR_PATH)
+function(CT_NIF_EXISTS_DIR_THROW PATH)
 	set(ret)
-	CT_EXISTS_DIR(ret ${DIR_PATH})
+	CT_EXISTS(ret ${PATH})
 
 	if(NOT ${RET})
-		CT_THROW_ERROR(${CT_CONST_ERROR_TITLE} "Directory `${DIR_PATH}` already exists")
+		CT_THROW_ERROR(${CT_CONST_ERROR_TITLE} "Directory `${PATH}` already exists")
 	endif()
 endfunction()
 
 #
-function(CT_CREATE_PROJECT NAME)
-	set(path "${CT_CONST_PROJECT_DIR_PATH}/${NAME}")
-	CT_IF_EXISTS_DIR_THROW(${path})
-	file(MAKE_DIRECTORY ${path})
-	file(MAKE_DIRECTORY "${path}/${CT_CONST_PROJECT_SPEC_DIR_SUBPROJECTS}")
-	CT_WRITE_TEXTFILE("${CT_CONST_PROJECT_DIR_PATH}/${CT_CONST_CMAKE_DATAFILE}" "${NAME}")
+function(CT_MAKE_PROJECT NAME)
+	file(MAKE_DIRECTORY "${CT_CONST_CUR_SCRIPT_PATH}/${NAME}")
+	file(MAKE_DIRECTORY "${CT_CONST_CUR_SCRIPT_PATH}/${NAME}/${CT_CONST_SUBPROJECT_SPEC_DIR_SRC}")
+	file(MAKE_DIRECTORY "${CT_CONST_CUR_SCRIPT_PATH}/${NAME}/${CT_CONST_SUBPROJECT_SPEC_DIR_RES}")
+	file(MAKE_DIRECTORY "${CT_CONST_CUR_SCRIPT_PATH}/${NAME}/${CT_CONST_SUBPROJECT_SPEC_DIR_INF}")
 endfunction()
 
+function(CT_READ_CMAKEPROJECTLISTS RET_PROJECTS)
+	set(file_path "${CT_CONST_CUR_SCRIPT_PATH}/CMakeProjectLists.cmake")
+	set(project_dir_prefix "CTP_")
+	CT_EXISTS(project_list_file ${file_path})
+
+	if(NOT project_list_file)
+		CT_WRITE_TEXTFILE(${file_path}
+			"#
+# Add your project name to `CT_PROJECTS`(list) variable
+# Names in `CT_PROJECTS` are compared with the project directory, and names not in `CT_PROJECTS` are removed. (Warning)
+# Project directories are prefixed with `${project_dir_prefix}`. Be careful when creating new directories
 #
-function(CT_GET_PROJECT_NAME RET)
-	CT_READ_TEXTFILE(${RET} "${CT_CONST_PROJECT_DIR_PATH}/${CT_CONST_CMAKE_DATAFILE}")
-endfunction()
 
-#
-function(CT_UPDATE_SUBPROJECTS)
-	set(project_name)
-	CT_GET_PROJECT_NAME(project_name)
-	set(path "${project_name}/${NAME}")
-	CT_IF_EXISTS_DIR_THROW(${path})
-	file(MAKE_DIRECTORY "${path}")
-	file(MAKE_DIRECTORY "${path}/${CT_CONST_SUBPROJECT_SPEC_DIR_SRC}")
-	file(MAKE_DIRECTORY "${path}/${CT_CONST_SUBPROJECT_SPEC_DIR_RES}")
-	file(MAKE_DIRECTORY "${path}/${CT_CONST_SUBPROJECT_SPEC_DIR_INF}")
-endfunction()
+set(CT_PROJECTS
 
-#
-function(CT_FIND_TEXTFILES output_list)
-	set(search_dir "${CMAKE_CURRENT_SOURCE_DIR}/Projects")
-	set(glob_expression "${search_dir}/**/*.txt")
-
-	file(GLOB_RECURSE text_files ${glob_expression})
-
-	if(NOT text_files)
-		CT_LOG_WRITELINE("No text files were found in ${search_dir} or its subdirectories.")
-	else()
-		list(APPEND ${output_list} ${text_files})
-		CT_LOG_WRITELINE("The following text files were found:")
-
-		foreach(file ${text_files})
-			CT_LOG_WRITELINE("  ${file}")
-		endforeach()
+)
+"
+		)
 	endif()
+
+	file(GLOB CTP_DIRS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "CTP_*")
+
+	CT_LOG_WRITELINE_PARTITION()
+	CT_LOG_WRITELINE("List of directories that once exist")
+	CT_LOG_WRITELINE_THIN_PARTITION()
+	CT_LOG_WRITELINE_LIST(CTP_DIRS)
+	CT_LOG_WRITELINE_PARTITION()
+
+	include(${file_path})
+
+	CT_LOG_WRITELINE_PARTITION()
+	CT_LOG_WRITELINE("List of confirmed projects")
+	CT_LOG_WRITELINE_THIN_PARTITION()
+	CT_LOG_WRITELINE_LIST(CT_PROJECTS)
+	CT_LOG_WRITELINE_PARTITION()
+
+	# foreach(project ${CT_PROJECTS})
+	# list(FIND ${CTP_DIRS} ${project} INDEX)
+
+	# if(${INDEX} EQUAL -1)
+	# CT_LOG_WRITELINE("Delete project -> `C://`")
+	# else()
+	# set(${RESULT_VAR} TRUE PARENT_SCOPE)
+	# endif()
+	# endforeach()
+
+	# foreach(dir ${CTP_DIRS})
+	# list(FIND ${CT_PROJECTS} ${dir} INDEX)
+
+	# if(${INDEX} EQUAL -1)
+	# CT_MAKE_PROJECT()
+	# endif()
+	# endforeach()
 endfunction()
 
 # ======================================[Execution Part]======================================
-# CT_CREATE_PROJECT("MyProject")
-function(PASS2 VAR_2)
-	message(${VAR_2})
-endfunction()
-
-function(PASS1 VAR_1)
-	PASS2(${VAR_1})
-endfunction()
-
-set(VAR_0 "VAR DATA")
-PASS1(VAR_0)
+CT_READ_CMAKEPROJECTLISTS(A)
