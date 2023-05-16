@@ -10,3 +10,9 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 out/
+CMakeENVInfo.cmake
+CMakeListsExecutor.cmake
+CMakeLists.txt
+CMakeProjectLists.cmake
+CMakeLists.txt
+CMakeLists.txt

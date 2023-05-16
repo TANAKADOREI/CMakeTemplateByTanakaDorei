@@ -40,7 +40,8 @@ set(CT_CONST_VARIABLE_TYPE_STRING "<:STRING:>" CACHE STRING ${CT_CONST_DOCSTRING
 set(CT_CONST_VARIABLE_TYPE_LIST "<:LIST:>" CACHE STRING ${CT_CONST_DOCSTRING} FORCE)
 set(CT_CONST_VARIABLE_TYPE_BOOL "<:BOOL:>" CACHE STRING ${CT_CONST_DOCSTRING} FORCE)
 
-set(CT_CONST_IDE_VSCODE "VSCODE" CACHE STRING ${CT_CONST_DOCSTRING} FORCE)
+set(CT_CONST_IDE_VSCODE "VisualStudioCode" CACHE STRING ${CT_CONST_DOCSTRING} FORCE)
+set(CT_CONST_IDE_VS "VisualStudio" CACHE STRING ${CT_CONST_DOCSTRING} FORCE)
 
 set(CT_CONST_CT_LOG_WRITELINE_CHARS "8" CACHE STRING ${CT_CONST_DOCSTRING} FORCE)
 set(CT_CONST_CT_LOG_WRITELINE_HEADER_CHARS "6" CACHE STRING ${CT_CONST_DOCSTRING} FORCE)
@@ -57,11 +58,17 @@ set(CT_OPTION_INNER_TESTER_SET_ENABLE FALSE CACHE BOOL ${CT_OPTION_DOCSTRING} FO
 
 # [Inner Options]
 # Options used internally. Modified within the script. Restrict user access
-set(CT_INNER_OPTION_MAKE_CMAKELISTS TRUE)
-set(CT_INNER_OPTION_LIBRARY_MODE FALSE)
+if(NOT DEFINED CT_INNER_OPTION_MAKE_CMAKELISTS)
+	set(CT_INNER_OPTION_MAKE_CMAKELISTS TRUE)
+endif()
+
+if(NOT DEFINED CT_INNER_OPTION_LIBRARY_MODE)
+	set(CT_INNER_OPTION_LIBRARY_MODE FALSE)
+endif()
 
 # [Cmake Header]
 cmake_minimum_required(VERSION ${CT_CONST_CMAKE_VERSION})
+
 if(NOT CT_INNER_OPTION_MAKE_CMAKELISTS)
 	project(
 		"CMAKETEMPLATE"
@@ -331,12 +338,15 @@ message(\":[${CT_CONST_ROOT_CMAKELISTS}]\")
 cmake_minimum_required(VERSION ${CT_CONST_CMAKE_VERSION})
 
 message(\"[${CT_CONST_ROOT_CMAKELISTS_EXE}]:\")
+
+include(\"\${CMAKE_CURRENT_SOURCE_DIR}/${CT_CONST_ROOT_CMAKE_ENV_INFO}\")
+
 set(output)
 
-if(NOT DEPENDS CT_CUR_IDE)
+if(NOT DEFINED _CT_CUR_IDE)
 
 execute_process(
-	COMMAND \${CMAKE_COMMAND} \${CMAKE_CURRENT_LIST_DIR} -B \${CMAKE_CURRENT_LIST_DIR}/CTBUILD -Wno-dev
+	COMMAND \${CMAKE_COMMAND} \${CMAKE_CURRENT_LIST_DIR} -B \${CMAKE_CURRENT_LIST_DIR}/\${_CT_CMAKEBUILDDIRECTORY_NAME} -Wno-dev
 	OUTPUT_VARIABLE output
 )
 message(\${output})
@@ -352,15 +362,25 @@ message(\":[${CT_CONST_ROOT_CMAKELISTS_EXE}]\")
 	endif()
 
 	if(NOT EXISTS ${CT_CONST_ROOT_CMAKE_ENV_INFO_PATH})
-	CT_WRITE_TEXTFILE(${CT_CONST_ROOT_CMAKE_ENV_INFO_PATH}
-		"#
-# Select the appropriate IDE from the list below and uncomment it. Only one.
+		CT_WRITE_TEXTFILE(${CT_CONST_ROOT_CMAKE_ENV_INFO_PATH}
+			"# ============================
+# You just need to uncomment the variables that fit your environment. You don't have to uncomment it if you don't want to use the IDE.
 #
 
-#set(CT_CUR_IDE \"${CT_CONST_IDE_VSCODE}\")
-"
-	)
+#set(_CT_CUR_IDE \"${CT_CONST_IDE_VSCODE}\")
+#set(_CT_CUR_IDE \"${CT_CONST_IDE_VS}\")
+
+# ============================
+# In this part, if you do not use IDE, you can set (modify) the variables below.
+
+if(NOT DEFINED _CT_CUR_IDE)
+	set(_CT_CMAKEBUILDDIRECTORY_NAME \"out\")
 endif()
+
+# ============================
+"
+		)
+	endif()
 endfunction()
 
 function(CT_MAKE_CMAKEPROJECTLISTS)
@@ -446,7 +466,7 @@ endfunction()
 if(CT_INNER_OPTION_MAKE_CMAKELISTS)
 	# Event when creating root `CMakeLists.txt`
 	CT_LOG_WRITELINE_PARTITION()
-	CT_LOG_WRITELINE("Event when creating root `CMakeLists.txt`")
+	CT_LOG_WRITELINE("Base file creation and check")
 	CT_LOG_WRITELINE_PARTITION()
 	CT_MAKE_BASEFILES()
 else()
