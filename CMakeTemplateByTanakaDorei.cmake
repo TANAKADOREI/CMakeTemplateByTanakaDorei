@@ -7,22 +7,25 @@
 # `RET` <- It is used the same as the `VAR` keyword, and explicitly expresses that it is just a variable to receive a return value.
 #
 # Non-keyword names can pass arguments as value types.
+#
+cmake_minimum_required(VERSION 3.25)
 
-# ======================================[Cmake Constant Data]======================================
-# These are data that should not be changed.
-
-function(CT_MAKE_CMAKEROOT)
-	if(EXISTS "CMakeTemplateByTanakaDorei.cmake")
-		if(NOT EXISTS "CMakeRoot.cmake")
-			CT_WRITE_TEXTFILE("CMakeRoot.cmake"
-				"#
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/CMakeTemplateByTanakaDorei.cmake")
+	if(NOT EXISTS "CMakeRoot.cmake")
+		file(WRITE "CMakeRoot.cmake"
+			"#
 # do not modify this file
 #
-cmake_minimum_required(VERSION ${CT_CONST_CMAKE_VERSION})
+cmake_minimum_required(VERSION 3.25)
+
+set(CT_CMAKETEMPLATEBYTANAKADOREI \"3654836749\")
+
+set(CT_CONST_CMAKE_VERSION \"3.25\")
+
 set(CT_CONST_ROOT_DIR_PATH \"${CMAKE_CURRENT_SOURCE_DIR}\")
 set(CT_CONST_ROOT_NAME_CMAKEROOT \"CMakeRoot.cmake\")
 set(CT_CONST_ROOT_NAME_CMAKEENVSETTINGS \"CMakeENVSettings.cmake\")
-set(CT_CONST_ROOT_NAME_CMAKELISTS \"CMakeENVSettings.cmake\")
+set(CT_CONST_ROOT_NAME_CMAKELISTS \"CMakeLists.txt\")
 set(CT_CONST_ROOT_NAME_CMAKEROOTLISTSEXECUTOR \"CMakeRootListsExecutor.cmake\")
 set(CT_CONST_ROOT_NAME_CMAKEPROJECTS \"CMakeProjects.cmake\")
 set(CT_CONST_ROOT_NAME_CMAKETEMPLATEBYTANAKADOREI \"CMakeTemplateByTanakaDorei.cmake\")
@@ -34,70 +37,53 @@ set(CT_CONST_ROOT_PATH_CMAKEROOTLISTSEXECUTOR \"\${CT_CONST_ROOT_DIR_PATH}/\${CT
 set(CT_CONST_ROOT_PATH_CMAKEPROJECTS \"\${CT_CONST_ROOT_DIR_PATH}/\${CT_CONST_ROOT_NAME_CMAKEPROJECTS}\")
 set(CT_CONST_ROOT_PATH_CMAKETEMPLATEBYTANAKADOREI \"\${CT_CONST_ROOT_DIR_PATH}/\${CT_CONST_ROOT_NAME_CMAKETEMPLATEBYTANAKADOREI}\")
 
+set(CT_CONST_SEPCFILE_NAME_CMAKELISTS \"CMakeLists.txt\")
+
 set(CT_CONST_PROJECT_DIR_PREFIX \"CTP_\")
+
 set(CT_CONST_SEPCDIR_NAME_CMK \"cmk\")
 set(CT_CONST_SEPCDIR_NAME_SRC \"src\")
 set(CT_CONST_SEPCDIR_NAME_RES \"res\")
 
-set(CT_CONST_SEPCFILE_NAME_CMAKELISTS \"CMakeLists.txt\")
+set(CT_CONST_CT_LOG_WRITELINE_CHARS \"8\")
+set(CT_CONST_CT_LOG_WRITELINE_HEADER_CHARS \"6\")
+set(CT_CONST_CT_LOG_WRITELINE_FOOTER_CHARS \"2\")
+set(CT_OPTION_MAX_CHARS_PER_LINE \"100\")
+set(CT_OPTION_ELEMENTS_PER_LINE \"4\")
+
 "
-			)
-		endif()
-		include("CMakeRoot.cmake")
+		)
 	endif()
-endfunction()
 
-CT_MAKE_CMAKEROOT()
+	include("CMakeRoot.cmake")
 
-if(NOT DEFINED CMAKE_TEMPLATE_BY_TANAKADOREI)
-	set(CT_CONST_SUBPROJECT_SPEC_DIR_CMK "cmk" CACHE STRING ${CT_CONST_DOCSTRING} FORCE)
-	set(CT_CONST_SUBPROJECT_SPEC_DIR_SRC "src" CACHE STRING ${CT_CONST_DOCSTRING} FORCE)
-	set(CT_CONST_SUBPROJECT_SPEC_DIR_RES "res" CACHE STRING ${CT_CONST_DOCSTRING} FORCE)
-	set(CT_CONST_PROJECT_DIR_PREFIX "CTP_" CACHE STRING ${CT_CONST_DOCSTRING} FORCE)
+	# [RootLogic]
+	# ┌────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+	if(NOT DEFINED CT_CMAKETEMPLATEBYTANAKADOREI OR NOT ${CT_CMAKETEMPLATEBYTANAKADOREI} STREQUAL "3654836749")
+		message(FATAL_ERROR "I thought it was the current root directory location and I used the 'include' command for 'CMakeRoot.cmake', but it doesn't seem to be loaded.")
+	endif()
 
-	set(CT_CONST_IDE_VSCODE "VisualStudioCode" CACHE STRING ${CT_CONST_DOCSTRING} FORCE)
-	set(CT_CONST_IDE_VS "VisualStudio" CACHE STRING ${CT_CONST_DOCSTRING} FORCE)
+	set(CT_THIS_SCRIPTFILE_IS_ROOTDIR TRUE)
 
-	#move required
-	set(CT_CONST_CT_LOG_WRITELINE_CHARS "8" CACHE STRING ${CT_CONST_DOCSTRING} FORCE)
-	set(CT_CONST_CT_LOG_WRITELINE_HEADER_CHARS "6" CACHE STRING ${CT_CONST_DOCSTRING} FORCE)
-	set(CT_CONST_CT_LOG_WRITELINE_FOOTER_CHARS "2" CACHE STRING ${CT_CONST_DOCSTRING} FORCE)
-
-	set(CT_OPTION_MAX_CHARS_PER_LINE "100" CACHE STRING ${CT_OPTION_DOCSTRING} FORCE)
-	set(CT_OPTION_ELEMENTS_PER_LINE "4" CACHE STRING ${CT_OPTION_DOCSTRING} FORCE)
-	set(CT_OPTION_INNER_TESTER_SET_ENABLE FALSE CACHE BOOL ${CT_OPTION_DOCSTRING} FORCE)
+	# └────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 endif()
 
 # [Inner Options]
+# ┌────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # Options used internally. Modified within the script. Restrict user access
-if(NOT DEFINED CT_INNER_OPTION_MAKE_CMAKELISTS)
-	set(CT_INNER_OPTION_MAKE_CMAKELISTS TRUE)
-endif()
-
 if(NOT DEFINED CT_INNER_OPTION_LIBRARY_MODE)
 	set(CT_INNER_OPTION_LIBRARY_MODE FALSE)
 endif()
 
 # Must be called at the end of that file
 function(CT_INNER_OPTIONS_UNSET)
-	unset(CT_INNER_OPTION_MAKE_CMAKELISTS)
 	unset(CT_INNER_OPTION_LIBRARY_MODE)
 endfunction()
 
-# [Cmake Header]
-cmake_minimum_required(VERSION ${CT_CONST_CMAKE_VERSION})
-
-if(NOT CT_INNER_OPTION_MAKE_CMAKELISTS)
-	project(
-		"CMAKETEMPLATE"
-		VERSION
-		"2023.5.11"
-		DESCRIPTION
-		"https://github.com/TANAKADOREI/CMakeTemplate"
-	)
-endif()
+# └────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 
 # [Cmake Decl Functions]
+# ┌────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 
 #
 function(CT_THROW_ERROR MSG)
@@ -111,7 +97,7 @@ function(CT_CHECK_VARIABLE VAR)
 		if(${VAR})
 		# exist
 		else()
-			CT_THROW_ERROR(${CMAKE_CURRENT_FUNCTION} "${VAR} is empty.")
+			CT_THROW_ERROR("${VAR} is empty.")
 		endif()
 	else()
 		CT_THROW_ERROR("${VAR} is not defined.")
@@ -246,7 +232,7 @@ function(CT_LOG_WRITELINE_LIST VAR_LIST BOOL_LINEAR_SHOW)
 					CT_LOG_WRITELINE(${temp_list})
 				endif()
 			else()
-				foreach(item ${VAR_LIST})
+				foreach(item ${${VAR_LIST}})
 					CT_LOG_WRITELINE("* ${item}")
 				endforeach()
 			endif()
@@ -298,6 +284,7 @@ function(CT_NIF_EXISTS_DIR_THROW PATH)
 	endif()
 endfunction()
 
+#
 function(CT_CHECK_NAME STRING)
 	if(STRING MATCHES "^[a-zA-Z0-9_]*$")
 	else()
@@ -305,17 +292,24 @@ function(CT_CHECK_NAME STRING)
 	endif()
 endfunction()
 
+# └────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
 #
-function(CT_MAKE_PROJECT TARGET_DIR_PATH)
-	file(MAKE_DIRECTORY "${TARGET_DIR_PATH}")
-	file(MAKE_DIRECTORY "${TARGET_DIR_PATH}/${CT_CONST_SUBPROJECT_SPEC_DIR_CMK}")
-	file(MAKE_DIRECTORY "${TARGET_DIR_PATH}/${CT_CONST_SUBPROJECT_SPEC_DIR_SRC}")
-	file(MAKE_DIRECTORY "${TARGET_DIR_PATH}/${CT_CONST_SUBPROJECT_SPEC_DIR_RES}")
-	CT_WRITE_TEXTFILE("${TARGET_DIR_PATH}/${CT_CONST_ROOT_CMAKELISTS}"
-		"#
+function(CT_MAKE_PROJECTDIR NAME)
+	file(MAKE_DIRECTORY "${CT_CONST_ROOT_DIR_PATH}/${NAME}")
+	file(MAKE_DIRECTORY "${CT_CONST_ROOT_DIR_PATH}/${NAME}/${CT_CONST_SEPCDIR_NAME_CMK}")
+	file(MAKE_DIRECTORY "${CT_CONST_ROOT_DIR_PATH}/${NAME}/${CT_CONST_SEPCDIR_NAME_SRC}")
+	file(MAKE_DIRECTORY "${CT_CONST_ROOT_DIR_PATH}/${NAME}/${CT_CONST_SEPCDIR_NAME_RES}")
+
+	set(file_path "${CT_CONST_ROOT_DIR_PATH}/${NAME}/${CT_CONST_SEPCFILE_NAME_CMAKELISTS}")
+
+	if(NOT EXISTS ${file_path})
+		CT_WRITE_TEXTFILE(${file_path}
+			"#
 set(CT_PROJECT_NAME \"${NAME}\")
 set(CT_PROJECT_PRE_CMAKESCRIPTS)
 set(CT_PROJECT_FIND_PACKAGES)
+set(CT_PRECOMPILE_HEADERS)
 set(CT_PROJECT_CODEFILES)
 set(CT_PROJECT_COMPILE_DEFINITIONS)
 set(CT_PROJECT_COMPILE_FEATURES)
@@ -328,15 +322,17 @@ set(CT_PROJECT_POST_CMAKESCRIPTS)
 set(CT_PROJECT_BUILD_POST_CMAKESCRIPTS)
 set(CT_PROJECT_BUILD_PRE_CMAKESCRIPTS)
 
-include(\${CT_CONST_ROOT_CMAKETEMPLATEBYTANAKADOREI_PATH})
-CT_PROJECT_SCRIPT()
+set(CT_INNER_OPTION_LIBRARY_MODE TRUE)
+include(\${CT_CONST_ROOT_PATH_CMAKETEMPLATEBYTANAKADOREI})
+CT_PROJECTDIR_SCRIPT()
 "
-	)
+		)
+	endif()
 endfunction()
 
-function(CT_PROJECT_SCRIPT)
+function(CT_PROJECTDIR_SCRIPT)
 	foreach(packages ${CT_PROJECT_PRE_CMAKESCRIPTS})
-		include(${CT_CONST_ROOT_CMAKELISTS})
+		include("${CT_CONST_SEPCDIR_NAME_CMK}/${packages}")
 	endforeach()
 
 	find_package(${CT_PROJECT_FIND_PACKAGES} REQUIRED)
@@ -348,80 +344,85 @@ function(CT_PROJECT_SCRIPT)
 	target_link_directories(${CT_PROJECT_NAME} PRIVATE ${CT_PROJECT_LINK_DIRECTORIES})
 	target_link_libraries(${CT_PROJECT_NAME} PRIVATE ${CT_PROJECT_LINK_LIBRARIES})
 	target_link_options(${CT_PROJECT_NAME} PRIVATE ${CT_PROJECT_LINK_OPTIONS})
-	target_precompile_headers(${CT_PROJECT_NAME} PRIVATE)
+	target_precompile_headers(${CT_PROJECT_NAME} PRIVATE ${CT_PRECOMPILE_HEADERS})
 endfunction()
 
-function(CT_MAKE_BASEFILES)
-	if(NOT EXISTS ${CT_CONST_ROOT_CMAKELISTS_PATH})
-		CT_WRITE_TEXTFILE(${CT_CONST_ROOT_CMAKELISTS_PATH}
+function(CT_MAKE_CMAKEENVSETTINGS)
+	if(NOT EXISTS ${CT_CONST_ROOT_PATH_CMAKEENVSETTINGS})
+		CT_WRITE_TEXTFILE(${CT_CONST_ROOT_PATH_CMAKEENVSETTINGS}
 			"#
-# do not modify this file
-#
-cmake_minimum_required(VERSION ${CT_CONST_CMAKE_VERSION})
-set(CT_INNER_OPTION_MAKE_CMAKELISTS FALSE)
-message(\"[${CT_CONST_ROOT_CMAKELISTS}]:\")
-include(\"${CT_CONST_ROOT_CMAKETEMPLATEBYTANAKADOREI}\")
-message(\":[${CT_CONST_ROOT_CMAKELISTS}]\")
+# If your IDE supports Cmake
+set(CT_IDE_MODE TRUE)
 "
 		)
 	endif()
+endfunction()
 
-	if(NOT EXISTS ${CT_CONST_ROOT_CMAKELISTS_EXE_PATH})
-		CT_WRITE_TEXTFILE(${CT_CONST_ROOT_CMAKELISTS_EXE_PATH}
+# Root CMakeLists.txt fileをつくる
+function(CT_MAKE_ROOTCMAKELISTS)
+	if(NOT EXISTS ${CT_CONST_ROOT_PATH_CMAKELISTS})
+		CT_WRITE_TEXTFILE(${CT_CONST_ROOT_PATH_CMAKELISTS}
 			"#
-# do not modify this file
+# Only edit the `project` command, don't edit the rest
+#
+cmake_minimum_required(VERSION ${CT_CONST_CMAKE_VERSION})
+project(
+	\"CMAKETEMPLATEBYTANAKADOREI\"
+	VERSION
+	\"2023.5.11\"
+	DESCRIPTION
+	\"https://github.com/TANAKADOREI/CMakeTemplate\"
+)
+message(\"[${CT_CONST_ROOT_NAME_CMAKELISTS}]:\")
+include(\"${CT_CONST_ROOT_NAME_CMAKETEMPLATEBYTANAKADOREI}\")
+message(\":[${CT_CONST_ROOT_NAME_CMAKELISTS}]\")
+"
+		)
+	endif()
+endfunction()
+
+# IDE_MODEがFALSEとき使用できるScript
+function(CT_MAKE_CMAKEROOTLISTSEXECUTOR)
+	if(NOT EXISTS ${CT_CONST_ROOT_PATH_CMAKEROOTLISTSEXECUTOR})
+		CT_WRITE_TEXTFILE(${CT_CONST_ROOT_PATH_CMAKEROOTLISTSEXECUTOR}
+			"#
+# Only the command line part of the `execute_process` part can be modified.
 #
 cmake_minimum_required(VERSION ${CT_CONST_CMAKE_VERSION})
 
-message(\"[${CT_CONST_ROOT_CMAKELISTS_EXE}]:\")
+message(\"[${CT_CONST_ROOT_NAME_CMAKEROOTLISTSEXECUTOR}]:\")
 
-include(\"${CT_CONST_ROOT_CMAKE_ENV_INFO}\")
+include(\"${CT_CONST_ROOT_NAME_CMAKEROOT}\")
+include(\"${CT_CONST_ROOT_NAME_CMAKEENVSETTINGS}\")
 
 set(output)
 
-if(NOT DEFINED _CT_CUR_IDE)
+if(NOT CT_IDE_MODE)
 
 execute_process(
-	COMMAND \${CMAKE_COMMAND} \${CMAKE_CURRENT_LIST_DIR} -B \${CMAKE_CURRENT_LIST_DIR}/\${_CT_CMAKEBUILDDIRECTORY_NAME} -Wno-dev
-	OUTPUT_VARIABLE output
+COMMAND
+# [editable part]
+# ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+\${CMAKE_COMMAND} \${CT_CONST_ROOT_DIR_PATH} -B \${CT_CONST_ROOT_DIR_PATH}/CMakeTemplateOutput -Wno-dev
+# └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+OUTPUT_VARIABLE output
 )
 message(\${output})
 
 else()
 
-message(\"Once you've decided on an IDE, you won't be able to use the features of that file. Do not command with `-P` option, follow your IDE's capabilities\")
+message(\"This script file cannot be used when `CT_IDE_MODE` of `CMakeENVSettings.cmake` is true.\")
 
 endif()
-message(\":[${CT_CONST_ROOT_CMAKELISTS_EXE}]\")
-"
-		)
-	endif()
-
-	if(NOT EXISTS ${CT_CONST_ROOT_CMAKE_ENV_INFO_PATH})
-		CT_WRITE_TEXTFILE(${CT_CONST_ROOT_CMAKE_ENV_INFO_PATH}
-			"# ============================
-# You just need to uncomment the variables that fit your environment. You don't have to uncomment it if you don't want to use the IDE.
-#
-
-#set(_CT_CUR_IDE \"${CT_CONST_IDE_VSCODE}\")
-#set(_CT_CUR_IDE \"${CT_CONST_IDE_VS}\")
-
-# ============================
-# In this part, if you do not use IDE, you can set (modify) the variables below.
-
-if(NOT DEFINED _CT_CUR_IDE)
-	set(_CT_CMAKEBUILDDIRECTORY_NAME \"out\")
-endif()
-
-# ============================
+message(\":[${CT_CONST_ROOT_NAME_CMAKEROOTLISTSEXECUTOR}]\")
 "
 		)
 	endif()
 endfunction()
 
-function(CT_MAKE_CMAKEPROJECTLISTS)
-	if(NOT EXISTS ${CT_CONST_ROOT_CMAKEPROJECTLISTS_PATH})
-		CT_WRITE_TEXTFILE(${CT_CONST_ROOT_CMAKEPROJECTLISTS_PATH}
+function(CT_MAKE_CMAKEPROJECTS)
+	if(NOT EXISTS ${CT_CONST_ROOT_PATH_CMAKEPROJECTS})
+		CT_WRITE_TEXTFILE(${CT_CONST_ROOT_PATH_CMAKEPROJECTS}
 			"#
 # Add your project name to `CT_PROJECTS`(list) variable
 # Names in `CT_PROJECTS` are compared with the project directory, and names not in `CT_PROJECTS` are removed. (Warning)
@@ -436,9 +437,17 @@ set(CT_PROJECTS
 	endif()
 endfunction()
 
-function(CT_MAIN_LOGIC)
-	CT_MAKE_CMAKEPROJECTLISTS()
-	include(${CT_CONST_ROOT_CMAKEPROJECTLISTS_PATH})
+# [Root `CMakeLists.txt` logic]
+# ┌────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+if(DEFINED CT_THIS_SCRIPTFILE_IS_ROOTDIR)
+	unset(CT_THIS_SCRIPTFILE_IS_ROOTDIR)
+
+	CT_MAKE_CMAKEPROJECTS()
+	CT_MAKE_ROOTCMAKELISTS()
+	CT_MAKE_CMAKEENVSETTINGS()
+	CT_MAKE_CMAKEROOTLISTSEXECUTOR()
+
+	include(${CT_CONST_ROOT_PATH_CMAKEPROJECTS})
 
 	file(GLOB CTP_DIR_NAMES RELATIVE ${CT_CONST_ROOT_DIR_PATH} "${CT_CONST_PROJECT_DIR_PREFIX}*")
 
@@ -472,54 +481,43 @@ function(CT_MAIN_LOGIC)
 	CT_LOG_WRITELINE_PARTITION()
 	CT_LOG_WRITELINE_NEWLINE()
 
-	# opt
+	CT_LOG_WRITELINE_PARTITION()
+	CT_LOG_WRITELINE("project cleanup")
+	CT_LOG_WRITELINE_THIN_PARTITION()
+
 	foreach(project_path ${CT_PROJECT_PATH_LIST})
 		list(FIND CT_DIR_PATH_LIST "${project_path}" INDEX)
 
 		if(${INDEX} EQUAL -1)
 			CT_LOG_WRITELINE("[Create] ${project_path}")
-			CT_MAKE_PROJECT(${project_path})
+			list(FIND CT_PROJECT_PATH_LIST "${project_path}" INDEX)
+			list(GET CT_PROJECT_LIST ${INDEX} project_name)
+			CT_MAKE_PROJECTDIR("${CT_CONST_PROJECT_DIR_PREFIX}${project_name}")
 		else()
 			CT_LOG_WRITELINE("[Pass] ${project_path}")
 		endif()
 	endforeach()
+
+	CT_LOG_WRITELINE_THIN_PARTITION()
 
 	foreach(dir_path ${CT_DIR_PATH_LIST})
 		list(FIND CT_PROJECT_PATH_LIST "${dir_path}" INDEX)
 
 		if(${INDEX} EQUAL -1)
 			CT_LOG_WRITELINE("[Delete] ${dir_path}")
+
 			file(REMOVE_RECURSE ${dir_path})
 		else()
 			CT_LOG_WRITELINE("[Pass] ${dir_path}")
 		endif()
 	endforeach()
 
+	CT_LOG_WRITELINE_PARTITION()
+
 	foreach(project_path ${CT_PROJECT_PATH_LIST})
 		add_subdirectory(${project_path})
 	endforeach()
-endfunction()
-
-# [Execution Part]
-if(CT_INNER_OPTION_MAKE_CMAKELISTS)
-	# Event when creating root `CMakeLists.txt`
-	CT_LOG_WRITELINE_PARTITION()
-	CT_LOG_WRITELINE("Base file creation and check")
-	CT_LOG_WRITELINE_PARTITION()
-	CT_MAKE_BASEFILES()
-else()
-	if(NOT CT_INNER_OPTION_LIBRARY_MODE)
-		# Root `CMakeLists.txt` logic
-		CT_LOG_WRITELINE_PARTITION()
-		CT_LOG_WRITELINE("Root `CMakeLists.txt` logic")
-		CT_LOG_WRITELINE_PARTITION()
-		CT_MAIN_LOGIC()
-	else()
-		# When sub `CMakeLists.txt` is being accessed in library mode
-		CT_LOG_WRITELINE_PARTITION()
-		CT_LOG_WRITELINE("When sub `CMakeLists.txt` is being accessed in library mode")
-		CT_LOG_WRITELINE_PARTITION()
-	endif()
 endif()
 
+# └────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 CT_INNER_OPTIONS_UNSET()

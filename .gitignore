@@ -16,3 +16,8 @@ CMakeLists.txt
 CMakeProjectLists.cmake
 CMakeLists.txt
 CMakeLists.txt
+CMakeTemplateOutput/
+CMakeENVSettings.cmake
+CMakeProjects.cmake
+CMakeRoot.cmake
+CMakeRootListsExecutor.cmake
