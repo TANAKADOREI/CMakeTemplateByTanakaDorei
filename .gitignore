@@ -10,6 +10,7 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 out/
+CTP*
 CMakeENVInfo.cmake
 CMakeListsExecutor.cmake
 CMakeLists.txt

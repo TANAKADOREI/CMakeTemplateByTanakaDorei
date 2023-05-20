@@ -15,6 +15,8 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/CMakeTemplateByTanakaDorei.cmake")
 		file(WRITE "CMakeRoot.cmake"
 			"#
 # do not modify this file
+# The file is a read-only variable that can be used in included `CMakeLists.txt`. Please don't ever edit.
+# This file has the purpose of declaring constants, please do not edit it except for variables prefixed with `CT_OPTION_`.
 #
 cmake_minimum_required(VERSION 3.25)
 
@@ -27,6 +29,7 @@ set(CT_CONST_ROOT_NAME_CMAKEROOT \"CMakeRoot.cmake\")
 set(CT_CONST_ROOT_NAME_CMAKEENVSETTINGS \"CMakeENVSettings.cmake\")
 set(CT_CONST_ROOT_NAME_CMAKELISTS \"CMakeLists.txt\")
 set(CT_CONST_ROOT_NAME_CMAKEROOTLISTSEXECUTOR \"CMakeRootListsExecutor.cmake\")
+set(CT_CONST_ROOT_NAME_CMAKEPROJECTS \"CMakeProjects.cmake\")
 set(CT_CONST_ROOT_NAME_CMAKEPROJECTS \"CMakeProjects.cmake\")
 set(CT_CONST_ROOT_NAME_CMAKETEMPLATEBYTANAKADOREI \"CMakeTemplateByTanakaDorei.cmake\")
 
@@ -48,7 +51,14 @@ set(CT_CONST_SEPCDIR_NAME_RES \"res\")
 set(CT_CONST_CT_LOG_WRITELINE_CHARS \"8\")
 set(CT_CONST_CT_LOG_WRITELINE_HEADER_CHARS \"6\")
 set(CT_CONST_CT_LOG_WRITELINE_FOOTER_CHARS \"2\")
+
+#
+# [options...]
+#
+
+# The maximum number of characters that can be displayed on a single line in the terminal environment
 set(CT_OPTION_MAX_CHARS_PER_LINE \"100\")
+# Did you print one item per line when printing the list?
 set(CT_OPTION_ELEMENTS_PER_LINE \"4\")
 
 "
@@ -295,56 +305,342 @@ endfunction()
 # └────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 
 #
-function(CT_MAKE_PROJECTDIR NAME)
-	file(MAKE_DIRECTORY "${CT_CONST_ROOT_DIR_PATH}/${NAME}")
-	file(MAKE_DIRECTORY "${CT_CONST_ROOT_DIR_PATH}/${NAME}/${CT_CONST_SEPCDIR_NAME_CMK}")
-	file(MAKE_DIRECTORY "${CT_CONST_ROOT_DIR_PATH}/${NAME}/${CT_CONST_SEPCDIR_NAME_SRC}")
-	file(MAKE_DIRECTORY "${CT_CONST_ROOT_DIR_PATH}/${NAME}/${CT_CONST_SEPCDIR_NAME_RES}")
+function(CT_MAKE_PROJECTDIR DIR_NAME NAME)
+	set(project_path "${CT_CONST_ROOT_DIR_PATH}/${DIR_NAME}")
+	file(MAKE_DIRECTORY "${project_path}")
+	file(MAKE_DIRECTORY "${project_path}/${CT_CONST_SEPCDIR_NAME_CMK}")
+	file(MAKE_DIRECTORY "${project_path}/${CT_CONST_SEPCDIR_NAME_SRC}")
+	file(MAKE_DIRECTORY "${project_path}/${CT_CONST_SEPCDIR_NAME_RES}")
 
-	set(file_path "${CT_CONST_ROOT_DIR_PATH}/${NAME}/${CT_CONST_SEPCFILE_NAME_CMAKELISTS}")
+	set(file_path "${project_path}/${CT_CONST_SEPCFILE_NAME_CMAKELISTS}")
 
 	if(NOT EXISTS ${file_path})
 		CT_WRITE_TEXTFILE(${file_path}
 			"#
-set(CT_PROJECT_NAME \"${NAME}\")
+# Do not remove or add the variable prefix `CT_PROJECT_`.
+# The variable prefix `CT_PROJECT_CONST_` must not be written, such as removing or modifying the value.
+#
+
+#
+# project name. Must be the same as the name of the directory containing the current file.
+#
+set(CT_PROJECT_CONST_NAME \"${NAME}\")
+
+#
+# project path. Path to the directory containing the current file.
+#
+set(CT_PROJECT_CONST_PATH \"\${CT_CONST_ROOT_DIR_PATH}/\${CT_CONST_PROJECT_DIR_PREFIX}\${CT_PROJECT_CONST_NAME}\")
+
+#
+# project type. Whether it is an executable type or a library in the form of a library.
+# `EXE`(Executable) or `STLIB`(Static Library) or `SALIB`(Shared Library)
+#
+set(CT_PROJECT_TYPE)
+
+#
+# Script to run before the build script block
+# The directory the script will work in is by default the same as `${CT_PROJECT_CONST_PATH}`.
+#
 set(CT_PROJECT_PRE_CMAKESCRIPTS)
+
+#
+# `find_package` command delegate
+#
 set(CT_PROJECT_FIND_PACKAGES)
+
+#
+# `target_precompile_headers` command delegate
+#
 set(CT_PRECOMPILE_HEADERS)
+
+#
+# `target_sources` command delegate
+#
 set(CT_PROJECT_CODEFILES)
+
+#
+# `target_compile_definitions` command delegate
+#
 set(CT_PROJECT_COMPILE_DEFINITIONS)
+
+#
+# `target_compile_features` command delegate
+#
 set(CT_PROJECT_COMPILE_FEATURES)
+
+#
+# `target_compile_options` command delegate
+#
 set(CT_PROJECT_COMPILE_OPTIONS)
+
+#
+# `target_include_directories` command delegate
+#
 set(CT_PROJECT_INCLUDE_DIRECTORIES)
+
+#
+# `target_link_directories` command delegate
+#
 set(CT_PROJECT_LINK_DIRECTORIES)
+
+#
+# `target_link_libraries` command delegate
+#
 set(CT_PROJECT_LINK_LIBRARIES)
+
+#
+# `target_link_options` command delegate
+#
 set(CT_PROJECT_LINK_OPTIONS)
+
+#
+# Script to run after buildscript block
+# The directory the script will work in is by default the same as `${CT_PROJECT_CONST_PATH}`.
+#
 set(CT_PROJECT_POST_CMAKESCRIPTS)
-set(CT_PROJECT_BUILD_POST_CMAKESCRIPTS)
+
+#
+# Script to run before build
+# The directory the script will work in is by default the same as `${CT_PROJECT_CONST_PATH}`.
+#
 set(CT_PROJECT_BUILD_PRE_CMAKESCRIPTS)
 
-set(CT_INNER_OPTION_LIBRARY_MODE TRUE)
-include(\${CT_CONST_ROOT_PATH_CMAKETEMPLATEBYTANAKADOREI})
-CT_PROJECTDIR_SCRIPT()
+#
+# Script to run after build
+# The directory the script will work in is by default the same as `${CT_PROJECT_CONST_PATH}`.
+#
+set(CT_PROJECT_BUILD_POST_CMAKESCRIPTS)
+
+#
+# project dependencies. `add_definitions` delegate
+#
+set(CT_PROJECT_DEPENDENCIES)
+
+set(CT_INNER_OPTION_LIBRARY_MODE TRUE) # Editing is absolutely prohibited!
+include(\${CT_CONST_ROOT_PATH_CMAKETEMPLATEBYTANAKADOREI}) # Editing is absolutely prohibited!
+
+#
+#If you want to write a custom build script, just comment out the line below and write the build script you want from below. However, please do not modify the variable declaration part and data writing part in the upper line.
+#
+CT_PROJECT_CMAKELISTS_BASIC_SCRIPT()
+
 "
 		)
 	endif()
 endfunction()
 
-function(CT_PROJECTDIR_SCRIPT)
-	foreach(packages ${CT_PROJECT_PRE_CMAKESCRIPTS})
-		include("${CT_CONST_SEPCDIR_NAME_CMK}/${packages}")
+function(CT_PROJECT_CMAKELISTS_BASIC_SCRIPT)
+	CT_LOG_WRITELINE_NEWLINE()
+	CT_LOG_WRITELINE_PARTITION()
+	CT_CHECK_VARIABLE(CT_PROJECT_CONST_NAME)
+	CT_LOG_WRITELINE("ProjectName:")
+	CT_LOG_WRITELINE(${CT_PROJECT_CONST_NAME})
+	CT_CHECK_VARIABLE(CT_PROJECT_CONST_PATH)
+	CT_LOG_WRITELINE("ProjectPath:")
+	CT_LOG_WRITELINE(${CT_PROJECT_CONST_PATH})
+	CT_LOG_WRITELINE("Project Type:")
+	CT_LOG_WRITELINE(${CT_PROJECT_TYPE})
+	CT_LOG_WRITELINE_PARTITION()
+
+	if(CT_PROJECT_PRE_CMAKESCRIPTS)
+		CT_LOG_WRITELINE_PARTITION()
+		CT_LOG_WRITELINE_INNER_NEWLINE()
+		CT_LOG_WRITELINE("Script file to run before the build script block")
+		CT_LOG_WRITELINE_INNER_NEWLINE()
+		CT_LOG_WRITELINE_THIN_PARTITION()
+		CT_LOG_WRITELINE_LIST(CT_PROJECT_PRE_CMAKESCRIPTS FALSE)
+		CT_LOG_WRITELINE_PARTITION()
+
+		foreach(sc ${CT_PROJECT_PRE_CMAKESCRIPTS})
+			include("${CT_CONST_SEPCDIR_NAME_CMK}/${sc}")
+		endforeach()
+	endif()
+
+	if(CT_PROJECT_CODEFILES)
+		CT_LOG_WRITELINE_PARTITION()
+		CT_LOG_WRITELINE_INNER_NEWLINE()
+		CT_LOG_WRITELINE("sources")
+		CT_LOG_WRITELINE_INNER_NEWLINE()
+		CT_LOG_WRITELINE_THIN_PARTITION()
+		CT_LOG_WRITELINE_LIST(CT_PROJECT_CODEFILES FALSE)
+		CT_LOG_WRITELINE_PARTITION()
+	endif()
+
+	CT_CHECK_VARIABLE(CT_PROJECT_CODEFILES)
+	set(_TEMP_)
+
+	foreach(item ${CT_PROJECT_CODEFILES})
+		list(APPEND _TEMP_ "${CT_PROJECT_CONST_PATH}/${CT_CONST_SEPCDIR_NAME_SRC}/${item}")
 	endforeach()
 
-	find_package(${CT_PROJECT_FIND_PACKAGES} REQUIRED)
-	target_sources(${CT_PROJECT_NAME} PRIVATE ${CT_PROJECT_CODEFILES})
-	target_compile_definitions(${CT_PROJECT_NAME} PRIVATE ${CT_PROJECT_COMPILE_DEFINITIONS})
-	target_compile_features(${CT_PROJECT_NAME} PRIVATE ${CT_PROJECT_COMPILE_FEATURES})
-	target_compile_options(${CT_PROJECT_NAME} PRIVATE ${CT_PROJECT_COMPILE_OPTIONS})
-	target_include_directories(${CT_PROJECT_NAME} PRIVATE ${CT_PROJECT_INCLUDE_DIRECTORIES})
-	target_link_directories(${CT_PROJECT_NAME} PRIVATE ${CT_PROJECT_LINK_DIRECTORIES})
-	target_link_libraries(${CT_PROJECT_NAME} PRIVATE ${CT_PROJECT_LINK_LIBRARIES})
-	target_link_options(${CT_PROJECT_NAME} PRIVATE ${CT_PROJECT_LINK_OPTIONS})
-	target_precompile_headers(${CT_PROJECT_NAME} PRIVATE ${CT_PRECOMPILE_HEADERS})
+	set(CT_PROJECT_CODEFILES ${_TEMP_})
+	set(_TEMP_)
+	list(POP_FRONT CT_PROJECT_CODEFILES _TEMP_)
+
+	if(${CT_PROJECT_TYPE} STREQUAL "EXE")
+		add_executable(${CT_PROJECT_CONST_NAME} ${_TEMP_})
+	elseif(${CT_PROJECT_TYPE} STREQUAL "STLIB")
+		add_library(${CT_PROJECT_CONST_NAME} STATIC ${_TEMP_})
+	elseif(${CT_PROJECT_TYPE} STREQUAL "SALIB")
+		add_library(${CT_PROJECT_CONST_NAME} SHARED ${_TEMP_})
+	else()
+		CT_THROW_ERROR("unknown project type")
+	endif()
+
+	if(CT_PROJECT_CODEFILES)
+		target_sources(${CT_PROJECT_CONST_NAME} PRIVATE ${CT_PROJECT_CODEFILES})
+	endif()
+
+	unset(_TEMP_)
+
+	if(CT_PROJECT_FIND_PACKAGES)
+		CT_LOG_WRITELINE_PARTITION()
+		CT_LOG_WRITELINE_INNER_NEWLINE()
+		CT_LOG_WRITELINE("find packages")
+		CT_LOG_WRITELINE_INNER_NEWLINE()
+		CT_LOG_WRITELINE_THIN_PARTITION()
+		CT_LOG_WRITELINE_LIST(CT_PROJECT_FIND_PACKAGES FALSE)
+		CT_LOG_WRITELINE_PARTITION()
+		find_package(${CT_PROJECT_FIND_PACKAGES} REQUIRED)
+	endif()
+
+	if(CT_PROJECT_COMPILE_DEFINITIONS)
+		CT_LOG_WRITELINE_PARTITION()
+		CT_LOG_WRITELINE_INNER_NEWLINE()
+		CT_LOG_WRITELINE("compile definitions")
+		CT_LOG_WRITELINE_INNER_NEWLINE()
+		CT_LOG_WRITELINE_THIN_PARTITION()
+		CT_LOG_WRITELINE_LIST(CT_PROJECT_COMPILE_DEFINITIONS FALSE)
+		CT_LOG_WRITELINE_PARTITION()
+		target_compile_definitions(${CT_PROJECT_CONST_NAME} PRIVATE ${CT_PROJECT_COMPILE_DEFINITIONS})
+	endif()
+
+	if(CT_PROJECT_COMPILE_FEATURES)
+		CT_LOG_WRITELINE_PARTITION()
+		CT_LOG_WRITELINE_INNER_NEWLINE()
+		CT_LOG_WRITELINE("compile features")
+		CT_LOG_WRITELINE_INNER_NEWLINE()
+		CT_LOG_WRITELINE_THIN_PARTITION()
+		CT_LOG_WRITELINE_LIST(CT_PROJECT_COMPILE_FEATURES FALSE)
+		CT_LOG_WRITELINE_PARTITION()
+		target_compile_features(${CT_PROJECT_CONST_NAME} PRIVATE ${CT_PROJECT_COMPILE_FEATURES})
+	endif()
+
+	if(CT_PROJECT_COMPILE_OPTIONS)
+		CT_LOG_WRITELINE_PARTITION()
+		CT_LOG_WRITELINE_INNER_NEWLINE()
+		CT_LOG_WRITELINE("compile options")
+		CT_LOG_WRITELINE_INNER_NEWLINE()
+		CT_LOG_WRITELINE_THIN_PARTITION()
+		CT_LOG_WRITELINE_LIST(CT_PROJECT_COMPILE_OPTIONS FALSE)
+		CT_LOG_WRITELINE_PARTITION()
+		target_compile_options(${CT_PROJECT_CONST_NAME} PRIVATE ${CT_PROJECT_COMPILE_OPTIONS})
+	endif()
+
+	if(CT_PROJECT_INCLUDE_DIRECTORIES)
+		CT_LOG_WRITELINE_PARTITION()
+		CT_LOG_WRITELINE_INNER_NEWLINE()
+		CT_LOG_WRITELINE("include directories")
+		CT_LOG_WRITELINE_INNER_NEWLINE()
+		CT_LOG_WRITELINE_THIN_PARTITION()
+		CT_LOG_WRITELINE_LIST(CT_PROJECT_INCLUDE_DIRECTORIES FALSE)
+		CT_LOG_WRITELINE_PARTITION()
+		target_include_directories(${CT_PROJECT_CONST_NAME} PRIVATE ${CT_PROJECT_INCLUDE_DIRECTORIES})
+	endif()
+
+	if(CT_PROJECT_LINK_DIRECTORIES)
+		CT_LOG_WRITELINE_PARTITION()
+		CT_LOG_WRITELINE_INNER_NEWLINE()
+		CT_LOG_WRITELINE("Directories with linked libraries")
+		CT_LOG_WRITELINE_INNER_NEWLINE()
+		CT_LOG_WRITELINE_THIN_PARTITION()
+		CT_LOG_WRITELINE_LIST(CT_PROJECT_LINK_DIRECTORIES FALSE)
+		CT_LOG_WRITELINE_PARTITION()
+		target_link_directories(${CT_PROJECT_CONST_NAME} PRIVATE ${CT_PROJECT_LINK_DIRECTORIES})
+	endif()
+
+	if(CT_PROJECT_LINK_LIBRARIES)
+		CT_LOG_WRITELINE_PARTITION()
+		CT_LOG_WRITELINE_INNER_NEWLINE()
+		CT_LOG_WRITELINE("link libraries")
+		CT_LOG_WRITELINE_INNER_NEWLINE()
+		CT_LOG_WRITELINE_THIN_PARTITION()
+		CT_LOG_WRITELINE_LIST(CT_PROJECT_LINK_LIBRARIES FALSE)
+		CT_LOG_WRITELINE_PARTITION()
+		target_link_libraries(${CT_PROJECT_CONST_NAME} PRIVATE ${CT_PROJECT_LINK_LIBRARIES})
+	endif()
+
+	if(CT_PROJECT_LINK_OPTIONS)
+		CT_LOG_WRITELINE_PARTITION()
+		CT_LOG_WRITELINE_INNER_NEWLINE()
+		CT_LOG_WRITELINE("link options")
+		CT_LOG_WRITELINE_INNER_NEWLINE()
+		CT_LOG_WRITELINE_THIN_PARTITION()
+		CT_LOG_WRITELINE_LIST(CT_PROJECT_LINK_OPTIONS FALSE)
+		CT_LOG_WRITELINE_PARTITION()
+		target_link_options(${CT_PROJECT_CONST_NAME} PRIVATE ${CT_PROJECT_LINK_OPTIONS})
+	endif()
+
+	if(CT_PRECOMPILE_HEADERS)
+		CT_LOG_WRITELINE_PARTITION()
+		CT_LOG_WRITELINE_INNER_NEWLINE()
+		CT_LOG_WRITELINE("precompilation headers")
+		CT_LOG_WRITELINE_INNER_NEWLINE()
+		CT_LOG_WRITELINE_THIN_PARTITION()
+		CT_LOG_WRITELINE_LIST(CT_PRECOMPILE_HEADERS FALSE)
+		CT_LOG_WRITELINE_PARTITION()
+		target_precompile_headers(${CT_PROJECT_CONST_NAME} PRIVATE ${CT_PRECOMPILE_HEADERS})
+	endif()
+
+	CT_LOG_WRITELINE_PARTITION()
+	CT_LOG_WRITELINE_INNER_NEWLINE()
+	CT_LOG_WRITELINE("dependencies. before building the project. What to do and which projects to build first")
+	CT_LOG_WRITELINE_INNER_NEWLINE()
+	CT_LOG_WRITELINE_THIN_PARTITION()
+	CT_LOG_WRITELINE_LIST(CT_PROJECT_BUILD_PRE_CMAKESCRIPTS FALSE)
+	CT_LOG_WRITELINE_INNER_NEWLINE()
+	CT_LOG_WRITELINE_LIST(CT_PROJECT_DEPENDENCIES FALSE)
+	CT_LOG_WRITELINE_INNER_NEWLINE()
+	CT_LOG_WRITELINE_LIST(CT_PROJECT_BUILD_POST_CMAKESCRIPTS FALSE)
+	CT_LOG_WRITELINE_PARTITION()
+
+	foreach(sc ${CT_PROJECT_BUILD_PRE_CMAKESCRIPTS})
+		add_custom_target(pre_build_target
+			COMMENT "Pre-build target"
+			PRE_BUILD
+			COMMAND ${CMAKE_COMMAND} -P ${CT_PROJECT_CONST_PATH}/${CT_CONST_SEPCDIR_NAME_CMK}/${sc}
+			WORKING_DIRECTORY ${CT_PROJECT_CONST_PATH}
+		)
+		add_dependencies(${CT_PROJECT_CONST_NAME} pre_build_target)
+	endforeach()
+
+	if(CT_PROJECT_DEPENDENCIES)
+		add_definitions(${CT_PROJECT_CONST_NAME} ${CT_PROJECT_DEPENDENCIES})
+	endif()
+
+	foreach(sc ${CT_PROJECT_BUILD_POST_CMAKESCRIPTS})
+		add_custom_target(post_build_target
+			COMMENT "Post-build target"
+			POST_BUILD
+			COMMAND ${CMAKE_COMMAND} -P ${CT_PROJECT_CONST_PATH}/${CT_CONST_SEPCDIR_NAME_CMK}/${sc}
+			WORKING_DIRECTORY ${CT_PROJECT_CONST_PATH}
+		)
+		add_dependencies(${CT_PROJECT_CONST_NAME} post_build_target)
+	endforeach()
+
+	CT_LOG_WRITELINE_PARTITION()
+	CT_LOG_WRITELINE_INNER_NEWLINE()
+	CT_LOG_WRITELINE("Script files to be executed after the build script block")
+	CT_LOG_WRITELINE_INNER_NEWLINE()
+	CT_LOG_WRITELINE_THIN_PARTITION()
+	CT_LOG_WRITELINE_LIST(CT_PROJECT_POST_CMAKESCRIPTS FALSE)
+	CT_LOG_WRITELINE_PARTITION()
+
+	foreach(sc ${CT_PROJECT_POST_CMAKESCRIPTS})
+		include("${CT_CONST_SEPCDIR_NAME_CMK}/${sc}")
+	endforeach()
+
+	CT_LOG_WRITELINE_NEWLINE()
 endfunction()
 
 function(CT_MAKE_CMAKEENVSETTINGS)
@@ -487,18 +783,18 @@ if(DEFINED CT_THIS_SCRIPTFILE_IS_ROOTDIR)
 
 	foreach(project_path ${CT_PROJECT_PATH_LIST})
 		list(FIND CT_DIR_PATH_LIST "${project_path}" INDEX)
+		set(project_name)
+		list(FIND CT_PROJECT_PATH_LIST "${project_path}" INDEX)
+		list(GET CT_PROJECT_LIST ${INDEX} project_name)
 
 		if(${INDEX} EQUAL -1)
 			CT_LOG_WRITELINE("[Create] ${project_path}")
-			list(FIND CT_PROJECT_PATH_LIST "${project_path}" INDEX)
-			list(GET CT_PROJECT_LIST ${INDEX} project_name)
-			CT_MAKE_PROJECTDIR("${CT_CONST_PROJECT_DIR_PREFIX}${project_name}")
 		else()
 			CT_LOG_WRITELINE("[Pass] ${project_path}")
 		endif()
-	endforeach()
 
-	CT_LOG_WRITELINE_THIN_PARTITION()
+		CT_MAKE_PROJECTDIR("${CT_CONST_PROJECT_DIR_PREFIX}${project_name}" "${project_name}")
+	endforeach()
 
 	foreach(dir_path ${CT_DIR_PATH_LIST})
 		list(FIND CT_PROJECT_PATH_LIST "${dir_path}" INDEX)
@@ -508,7 +804,7 @@ if(DEFINED CT_THIS_SCRIPTFILE_IS_ROOTDIR)
 
 			file(REMOVE_RECURSE ${dir_path})
 		else()
-			CT_LOG_WRITELINE("[Pass] ${dir_path}")
+			# CT_LOG_WRITELINE("[Pass] ${dir_path}")
 		endif()
 	endforeach()
 
