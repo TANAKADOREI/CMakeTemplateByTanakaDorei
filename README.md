@@ -1,29 +1,28 @@
 # CMakeTemplateByTanakaDorei
+
+Comments are written in the file, so please follow the setup process below and go to the file for detailed explanation and check the comments.
+
 # Setup
 
-## Step1. Basics to configure cmake
+## Step1. Run `CMakeTemplateByTanakaDorei.cmake`
 
-Only when there is no `CMakeLists.txt` file, or when running for the first time
+Specify a working directory, place the `CMakeTemplateByTanakaDorei.cmake` script in that location, and execute the `cmake -P CMakeTemplateByTanakaDorei.cmake` command.
 
-cmd:
+## Step2. Generated Base File Description
 
-```shell
-cmake -P CMakeTemplateByTanakaDorei.cmake
-```
+`CMakeENVSettings.cmake` is a file related to the environment to run cmake on.
 
-## Step2. Set up the environment to run
+`CMakeLists.txt` is the root cmake file.
 
-By modifying the `CMakeENVInfo.cmake` file. Choose an environment.
+`CMakeProjects.cmake` is the project registry. Please note that only the project name written here can exist, and when the project name is removed, the related directory is also removed.
 
-## Step3. IDE
+`CMakeRoot.cmake` is a file where constant data is stored and also includes global variables. Detailed global settings can be found here
 
-You can configure it the way your IDE does.
+`CMakeRootListsExecutor.cmake` is a delegate to run cmake if you are not using an IDE.
 
-## Step3. no IDE
+## Step3. Simple usage
 
-### Step4. configure cmake
+Register the project in `CMakeProjects.cmake` and configure Cmake.
 
-```shell
-cmake -P CMakeListsExecutor.cmake
-```
-
+Project directories prefixed with `CTP_` are created, and an error is generated.
+The reason is that the data of `CMakeLists.txt` in the project directory was not completely written, so the problem occurred, so you don't have to worry. go ahead and fill out

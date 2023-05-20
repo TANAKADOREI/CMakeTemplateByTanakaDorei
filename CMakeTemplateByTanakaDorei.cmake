@@ -1,3 +1,4 @@
+# "https://github.com/TANAKADOREI/CMakeTemplate"
 # ======================================[Parameter Naming]======================================
 # Arguments must be carefully passed in the caller to the defined name of the parameter.
 # When used as a prefix, an underscore (_) is added after the keyword and the parameter name is written. When used alone, just write the keyword without an underscore.
@@ -13,7 +14,7 @@ cmake_minimum_required(VERSION 3.25)
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/CMakeTemplateByTanakaDorei.cmake")
 	if(NOT EXISTS "CMakeRoot.cmake")
 		file(WRITE "CMakeRoot.cmake"
-			"#
+			"# \"https://github.com/TANAKADOREI/CMakeTemplate\"
 # do not modify this file
 # The file is a read-only variable that can be used in included `CMakeLists.txt`. Please don't ever edit.
 # This file has the purpose of declaring constants, please do not edit it except for variables prefixed with `CT_OPTION_`.
@@ -316,7 +317,7 @@ function(CT_MAKE_PROJECTDIR DIR_NAME NAME)
 
 	if(NOT EXISTS ${file_path})
 		CT_WRITE_TEXTFILE(${file_path}
-			"#
+			"# \"https://github.com/TANAKADOREI/CMakeTemplate\"
 # Do not remove or add the variable prefix `CT_PROJECT_`.
 # The variable prefix `CT_PROJECT_CONST_` must not be written, such as removing or modifying the value.
 #
@@ -646,7 +647,7 @@ endfunction()
 function(CT_MAKE_CMAKEENVSETTINGS)
 	if(NOT EXISTS ${CT_CONST_ROOT_PATH_CMAKEENVSETTINGS})
 		CT_WRITE_TEXTFILE(${CT_CONST_ROOT_PATH_CMAKEENVSETTINGS}
-			"#
+			"# \"https://github.com/TANAKADOREI/CMakeTemplate\"
 # If your IDE supports Cmake
 set(CT_IDE_MODE TRUE)
 "
@@ -658,7 +659,7 @@ endfunction()
 function(CT_MAKE_ROOTCMAKELISTS)
 	if(NOT EXISTS ${CT_CONST_ROOT_PATH_CMAKELISTS})
 		CT_WRITE_TEXTFILE(${CT_CONST_ROOT_PATH_CMAKELISTS}
-			"#
+			"# \"https://github.com/TANAKADOREI/CMakeTemplate\"
 # Only edit the `project` command, don't edit the rest
 #
 cmake_minimum_required(VERSION ${CT_CONST_CMAKE_VERSION})
@@ -681,7 +682,7 @@ endfunction()
 function(CT_MAKE_CMAKEROOTLISTSEXECUTOR)
 	if(NOT EXISTS ${CT_CONST_ROOT_PATH_CMAKEROOTLISTSEXECUTOR})
 		CT_WRITE_TEXTFILE(${CT_CONST_ROOT_PATH_CMAKEROOTLISTSEXECUTOR}
-			"#
+			"# \"https://github.com/TANAKADOREI/CMakeTemplate\"
 # Only the command line part of the `execute_process` part can be modified.
 #
 cmake_minimum_required(VERSION ${CT_CONST_CMAKE_VERSION})
@@ -719,7 +720,7 @@ endfunction()
 function(CT_MAKE_CMAKEPROJECTS)
 	if(NOT EXISTS ${CT_CONST_ROOT_PATH_CMAKEPROJECTS})
 		CT_WRITE_TEXTFILE(${CT_CONST_ROOT_PATH_CMAKEPROJECTS}
-			"#
+			"# \"https://github.com/TANAKADOREI/CMakeTemplate\"
 # Add your project name to `CT_PROJECTS`(list) variable
 # Names in `CT_PROJECTS` are compared with the project directory, and names not in `CT_PROJECTS` are removed. (Warning)
 # Project directories are prefixed with `${CT_CONST_PROJECT_DIR_PREFIX}`. Be careful when creating new directories
