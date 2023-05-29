@@ -1,60 +1,88 @@
 # "https://github.com/TANAKADOREI/CMakeTemplate"
-# ======================================[Parameter Naming]======================================
-# Arguments must be carefully passed in the caller to the defined name of the parameter.
-# When used as a prefix, an underscore (_) is added after the keyword and the parameter name is written. When used alone, just write the keyword without an underscore.
-#
-# Keywords...
-# `VAR` <- Just write the variable name in the argument
-# `RET` <- It is used the same as the `VAR` keyword, and explicitly expresses that it is just a variable to receive a return value.
-#
-# Non-keyword names can pass arguments as value types.
-#
 cmake_minimum_required(VERSION 3.25)
 
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/CMakeTemplateByTanakaDorei.cmake")
-	if(NOT EXISTS "CMakeRoot.cmake")
-		file(WRITE "CMakeRoot.cmake"
-			"# \"https://github.com/TANAKADOREI/CMakeTemplate\"
+if(NOT EXISTS "${CMAKE_SOURCE_DIR}/CMakeTemplateByTanakaDorei.cmake" OR NOT EXISTS "${CMAKE_SOURCE_DIR}/CMakePresets.json")
+	message(FATAL_ERROR "Root directory does not contain '${CMAKE_SOURCE_DIR}/CMakeTemplateByTanakaDorei.cmake' or '${CMAKE_SOURCE_DIR}/CMakePresets.json'")
+endif()
+
+# [CT_MODE]
+# * SETUP : setup mode (This option is valid only with `cmake -P CMakeTemplateByTanakaDorei.cmake` option.)
+# * ROOT : Options available only to the root `CMakeLists.txt`
+# * LIB : Options for using functions from `CMake TemplateByTanakaDorei.cmake`
+if(NOT DEFINED CT_MODE)
+	if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/CMakeTemplateByTanakaDorei.cmake" AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/CMakePresets.json")
+		set(CT_MODE "SETUP")
+	endif()
+endif()
+
+# Must be called at the end of that file
+function(CT_INNER_OPTIONS_UNSET)
+	unset(CT_MODE)
+endfunction()
+
+# setup mode
+if(${CT_MODE} STREQUAL "SETUP" OR ${CT_MODE} STREQUAL "ROOT")
+	# only in the project root path
+	file(MAKE_DIRECTORY "CMakeGlobals")
+	file(MAKE_DIRECTORY "CMakeGlobals/src")
+	file(MAKE_DIRECTORY "CMakeGlobals/inj")
+
+	file(WRITE "CMakeConstants.cmake"
+		"# \"https://github.com/TANAKADOREI/CMakeTemplate\"
 # do not modify this file
 # The file is a read-only variable that can be used in included `CMakeLists.txt`. Please don't ever edit.
 # This file has the purpose of declaring constants, please do not edit it except for variables prefixed with `CT_OPTION_`.
 #
 cmake_minimum_required(VERSION 3.25)
 
-set(CT_CONST_CURFILE_CMAKEROOT_VERSION \"0\")
-
 set(CT_CMAKETEMPLATEBYTANAKADOREI \"3654836749\")
 
 set(CT_CONST_CMAKE_VERSION \"3.25\")
 
 set(CT_CONST_ROOT_DIR_PATH \"${CMAKE_CURRENT_SOURCE_DIR}\")
-set(CT_CONST_ROOT_NAME_CMAKEROOT \"CMakeRoot.cmake\")
-set(CT_CONST_ROOT_NAME_CMAKEENVSETTINGS \"CMakeENVSettings.cmake\")
+
+set(CT_CONST_ROOT_NAME_CMAKEPRESETS \"CMakePresets.cmake\")
+set(CT_CONST_ROOT_NAME_CMAKECONSTANTS \"CMakeConstants.cmake\")
+set(CT_CONST_ROOT_NAME_CMAKEGLOBALOPTIONS \"CMakeGlobalOptions.cmake\")
 set(CT_CONST_ROOT_NAME_CMAKELISTS \"CMakeLists.txt\")
-set(CT_CONST_ROOT_NAME_CMAKEROOTLISTSEXECUTOR \"CMakeRootListsExecutor.cmake\")
-set(CT_CONST_ROOT_NAME_CMAKEPROJECTS \"CMakeProjects.cmake\")
 set(CT_CONST_ROOT_NAME_CMAKEPROJECTS \"CMakeProjects.cmake\")
 set(CT_CONST_ROOT_NAME_CMAKETEMPLATEBYTANAKADOREI \"CMakeTemplateByTanakaDorei.cmake\")
-
-set(CT_CONST_ROOT_PATH_CMAKEROOT \"\${CT_CONST_ROOT_DIR_PATH}/\${CT_CONST_ROOT_NAME_CMAKEROOT}\")
-set(CT_CONST_ROOT_PATH_CMAKEENVSETTINGS \"\${CT_CONST_ROOT_DIR_PATH}/\${CT_CONST_ROOT_NAME_CMAKEENVSETTINGS}\")
-set(CT_CONST_ROOT_PATH_CMAKELISTS \"\${CT_CONST_ROOT_DIR_PATH}/\${CT_CONST_ROOT_NAME_CMAKELISTS}\")
-set(CT_CONST_ROOT_PATH_CMAKEROOTLISTSEXECUTOR \"\${CT_CONST_ROOT_DIR_PATH}/\${CT_CONST_ROOT_NAME_CMAKEROOTLISTSEXECUTOR}\")
-set(CT_CONST_ROOT_PATH_CMAKEPROJECTS \"\${CT_CONST_ROOT_DIR_PATH}/\${CT_CONST_ROOT_NAME_CMAKEPROJECTS}\")
-set(CT_CONST_ROOT_PATH_CMAKETEMPLATEBYTANAKADOREI \"\${CT_CONST_ROOT_DIR_PATH}/\${CT_CONST_ROOT_NAME_CMAKETEMPLATEBYTANAKADOREI}\")
-
-set(CT_CONST_SEPCFILE_NAME_CMAKELISTS \"CMakeLists.txt\")
-
-set(CT_CONST_PROJECT_DIR_PREFIX \"CTP_\")
+set(CT_CONST_ROOT_NAME_CMAKEDEPENDENCIES \"CMakeDependencies.cmake\")
 
 set(CT_CONST_SEPCDIR_NAME_CMK \"cmk\")
 set(CT_CONST_SEPCDIR_NAME_SRC \"src\")
 set(CT_CONST_SEPCDIR_NAME_RES \"res\")
+set(CT_CONST_SEPCDIR_NAME_INJ \"inj\")
+set(CT_CONST_SEPCDIR_NAME_CMAKEGLOBALS \"CMakeGlobals\")
+
+set(CT_CONST_ROOT_PATH_CMAKEPRESETS \"\${CT_CONST_ROOT_DIR_PATH}/\${CT_CONST_ROOT_NAME_CMAKEPRESETS}\")
+set(CT_CONST_ROOT_PATH_CMAKECONSTANTS \"\${CT_CONST_ROOT_DIR_PATH}/\${CT_CONST_ROOT_NAME_CMAKECONSTANTS}\")
+set(CT_CONST_ROOT_PATH_CMAKEGLOBALOPTIONS \"\${CT_CONST_ROOT_DIR_PATH}/\${CT_CONST_ROOT_NAME_CMAKEGLOBALOPTIONS}\")
+set(CT_CONST_ROOT_PATH_CMAKELISTS \"\${CT_CONST_ROOT_DIR_PATH}/\${CT_CONST_ROOT_NAME_CMAKELISTS}\")
+set(CT_CONST_ROOT_PATH_CMAKEPROJECTS \"\${CT_CONST_ROOT_DIR_PATH}/\${CT_CONST_ROOT_NAME_CMAKEPROJECTS}\")
+set(CT_CONST_ROOT_PATH_CMAKETEMPLATEBYTANAKADOREI \"\${CT_CONST_ROOT_DIR_PATH}/\${CT_CONST_ROOT_NAME_CMAKETEMPLATEBYTANAKADOREI}\")
+set(CT_CONST_ROOT_PATH_CMAKEDEPENDENCIES \"\${CT_CONST_ROOT_DIR_PATH}/\${CT_CONST_ROOT_NAME_CMAKEDEPENDENCIES}\")
+set(CT_CONST_ROOT_PATH_CMAKEGLOBALS \"\${CT_CONST_ROOT_DIR_PATH}/\${CT_CONST_SEPCDIR_NAME_CMAKEGLOBALS}\")
+set(CT_CONST_ROOT_PATH_CMAKEGLOBALS_SOURCE \"\${CT_CONST_ROOT_PATH_CMAKEGLOBALS}/\${CT_CONST_SEPCDIR_NAME_SRC}\")
+set(CT_CONST_ROOT_PATH_CMAKEGLOBALS_INJECT \"\${CT_CONST_ROOT_PATH_CMAKEGLOBALS}/\${CT_CONST_SEPCDIR_NAME_INJ}\")
+set(CT_CONST_ROOT_PATH_CMAKETEMPLATEDATA \"\${CT_CONST_ROOT_DIR_PATH}/CMakeTemplateData\")
+set(CT_CONST_ROOT_PATH_CMAKETEMPLATEDATA_CURRENTPRESET \"\${CT_CONST_ROOT_DIR_PATH}/CMakeTemplateData/\${CT_CONST_CURRENT_PRESET}\")
+set(CT_CONST_ROOT_PATH_CMAKETEMPLATEDATA_CURRENTPRESET_OUTPUT \"\${CT_CONST_ROOT_DIR_PATH}/CMakeTemplateData/\${CT_CONST_CURRENT_PRESET}/output\")
+
+set(CT_CONST_SEPCFILE_NAME_CMAKELISTS \"CMakeLists.txt\")
 
 set(CT_CONST_CT_LOG_WRITELINE_CHARS \"8\")
 set(CT_CONST_CT_LOG_WRITELINE_HEADER_CHARS \"6\")
 set(CT_CONST_CT_LOG_WRITELINE_FOOTER_CHARS \"2\")
 
+
+
+"
+	)
+
+	if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/CMakeGlobalOptions.cmake")
+		file(WRITE "CMakeGlobalOptions.cmake"
+			"# \"https://github.com/TANAKADOREI/CMakeTemplate\"
 #
 # [options...]
 #
@@ -63,35 +91,39 @@ set(CT_CONST_CT_LOG_WRITELINE_FOOTER_CHARS \"2\")
 set(CT_OPTION_MAX_CHARS_PER_LINE \"100\")
 # Did you print one item per line when printing the list?
 set(CT_OPTION_ELEMENTS_PER_LINE \"4\")
-
 "
 		)
 	endif()
 
-	include("CMakeRoot.cmake")
+	include("CMakeConstants.cmake")
+	include("CMakeGlobalOptions.cmake")
 
 	# [RootLogic]
 	# ┌────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 	if(NOT DEFINED CT_CMAKETEMPLATEBYTANAKADOREI OR NOT ${CT_CMAKETEMPLATEBYTANAKADOREI} STREQUAL "3654836749")
-		message(FATAL_ERROR "I thought it was the current root directory location and I used the 'include' command for 'CMakeRoot.cmake', but it doesn't seem to be loaded.")
+		message(FATAL_ERROR "I thought it was the current root directory location and I used the 'include' command for 'CMakeConstants.cmake', but it doesn't seem to be loaded.")
 	endif()
-
-	set(CT_THIS_SCRIPTFILE_IS_ROOTDIR TRUE)
 
 	# └────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 endif()
 
-# [Inner Options]
-# ┌────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-# Options used internally. Modified within the script. Restrict user access
-if(NOT DEFINED CT_INNER_OPTION_LIBRARY_MODE)
-	set(CT_INNER_OPTION_LIBRARY_MODE FALSE)
+if(NOT ${CT_MODE} STREQUAL "SETUP")
+	if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+		set(CT_CURRENT_SYSTEM "LINUX")
+	elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+		set(CT_CURRENT_SYSTEM "WINDOWS")
+	elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Android")
+		set(CT_CURRENT_SYSTEM "ANDROID")
+	else()
+		message(FATAL_ERROR "environment not supported : ${CMAKE_SYSTEM_NAME}")
+	endif()
+else()
+	set(CT_CURRENT_SYSTEM "Allow unknown system")
 endif()
 
-# Must be called at the end of that file
-function(CT_INNER_OPTIONS_UNSET)
-	unset(CT_INNER_OPTION_LIBRARY_MODE)
-endfunction()
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CT_CONST_ROOT_PATH_CMAKETEMPLATEDATA_CURRENTPRESET_OUTPUT}")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CT_CONST_ROOT_PATH_CMAKETEMPLATEDATA_CURRENTPRESET_OUTPUT}")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CT_CONST_ROOT_PATH_CMAKETEMPLATEDATA_CURRENTPRESET_OUTPUT}")
 
 # └────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 
@@ -164,6 +196,41 @@ endfunction()
 function(CT_LOG_WRITELINE MSG)
 	CT_WRITELINE_MSG_AUTO_PADDING(MSG ${MSG})
 	message("##[C]:${MSG}##")
+endfunction()
+
+function(CT_LOG_VERIFICATION_BEGIN RET_ID CREATE_ID MAX_COUNT)
+	set(${RET_ID} "${CREATE_ID}" ${MAX_COUNT} 0 PARENT_SCOPE)
+	CT_LOG_WRITELINE("Verification (total steps ${MAX_COUNT}) <${CREATE_ID}> (0/${MAX_COUNT})")
+endfunction()
+
+function(CT_LOG_VERIFICATION_UPDATE VAR_ID MSG)
+	list(GET ${VAR_ID} 0 ID)
+	list(GET ${VAR_ID} 1 MAX)
+	list(POP_BACK ${VAR_ID} CUR)
+
+	if(${CUR} GREATER ${MAX})
+		CT_LOG_WRITELINE("Verification step out of range. <${ID}> (${CUR}/${MAX}): \"${MSG}\"")
+	else()
+		set(num)
+		math(EXPR num "${CUR}+1")
+		list(APPEND ${VAR_ID} ${num})
+		set(${VAR_ID} ${${VAR_ID}} PARENT_SCOPE)
+		CT_LOG_WRITELINE("Verified <${ID}> (${num}/${MAX}): \"${MSG}\"")
+	endif()
+endfunction()
+
+function(CT_LOG_VERIFICATION_END VAR_ID)
+	list(GET ${VAR_ID} 0 ID)
+	list(GET ${VAR_ID} 1 MAX)
+	list(GET ${VAR_ID} 2 CUR)
+
+	if(${CUR} EQUAL ${MAX})
+		CT_LOG_WRITELINE("Verification process completed. <${ID}> (${CUR}/${MAX})")
+	else()
+		CT_THROW_ERROR("Ended without going through all verification steps. <${ID}> (${CUR}/${MAX})")
+	endif()
+
+	unset(${VAR_ID})
 endfunction()
 
 #
@@ -305,11 +372,22 @@ function(CT_CHECK_NAME STRING)
 	endif()
 endfunction()
 
+#
+function(CT_MODE_CHECK MODS__LIST_LITERAL_ONLY)
+	if(NOT ${CT_MODE} IN_LIST MODS__LIST_LITERAL_ONLY)
+		CT_THROW_ERROR("Unauthorized Access. Only the owner of '${MODS__LIST_LITERAL_ONLY}' permission can access it. current accessor `${CT_MODE}`")
+	endif()
+endfunction()
+
 # └────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 
+# [Root `CMakeLists.txt` logic]
+# ┌────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+
 #
-function(CT_MAKE_PROJECTDIR DIR_NAME NAME)
-	set(project_path "${CT_CONST_ROOT_DIR_PATH}/${DIR_NAME}")
+function(CT_MAKE_PROJECTDIR NAME)
+	CT_MODE_CHECK("ROOT")
+	set(project_path "${CT_CONST_ROOT_DIR_PATH}/${NAME}")
 	file(MAKE_DIRECTORY "${project_path}")
 	file(MAKE_DIRECTORY "${project_path}/${CT_CONST_SEPCDIR_NAME_CMK}")
 	file(MAKE_DIRECTORY "${project_path}/${CT_CONST_SEPCDIR_NAME_SRC}")
@@ -332,7 +410,7 @@ set(CT_PROJECT_CONST_NAME \"${NAME}\")
 #
 # project path. Path to the directory containing the current file.
 #
-set(CT_PROJECT_CONST_PATH \"\${CT_CONST_ROOT_DIR_PATH}/\${CT_CONST_PROJECT_DIR_PREFIX}\${CT_PROJECT_CONST_NAME}\")
+set(CT_PROJECT_CONST_PATH \"\${CT_CONST_ROOT_DIR_PATH}/\${CT_PROJECT_CONST_NAME}\")
 
 #
 # project type. Whether it is an executable type or a library in the form of a library.
@@ -346,7 +424,10 @@ set(CT_PROJECT_TYPE)
 set(CT_PROJECT_LANGUAGE)
 
 #
-# project mode. `PLUGIN` only performs actions related to running CMAKE scripts. `ENABLE` is the default. `DISABLE` will make it not included in the build.
+# project mode. 
+# `PLUGIN` only performs actions related to running CMAKE scripts.
+# `ENABLE` is the default.
+# `DISABLE` will make it not included in the build.
 #
 set(CT_PROJECT_PROC_MODE ENABLE)
 
@@ -355,6 +436,13 @@ set(CT_PROJECT_PROC_MODE ENABLE)
 # The directory the script will work in is by default the same as `${CT_PROJECT_CONST_PATH}`.
 #
 set(CT_PROJECT_PRE_CMAKESCRIPTS)
+
+#
+# custom build script files
+# It works in `PLUGIN` mode, and if it is not present, it is regarded as a project that does not use (does not build) the build script.
+# When writing a custom build script, you must create a target, and the name of the target must be made with `${CT_PROJECT_CONST_NAME}`
+#
+set(CT_PROJECT_BUILD_SCRIPTS)
 
 #
 # `find_package` command delegate
@@ -424,45 +512,39 @@ set(CT_PROJECT_BUILD_PRE_CMAKESCRIPTS)
 #
 set(CT_PROJECT_BUILD_POST_CMAKESCRIPTS)
 
-#
-# project dependencies. `add_definitions` delegate
-#
-set(CT_PROJECT_DEPENDENCIES)
-
-set(CT_INNER_OPTION_LIBRARY_MODE TRUE) # Editing is absolutely prohibited!
-include(\${CT_CONST_ROOT_PATH_CMAKETEMPLATEBYTANAKADOREI}) # Editing is absolutely prohibited!
-
-#
-#If you want to write a custom build script, just comment out the line below and write the build script you want from below. However, please do not modify the variable declaration part and data writing part in the upper line.
-#
+set(CT_MODE \"LIB\")
+include(\${CT_CONST_ROOT_PATH_CMAKETEMPLATEBYTANAKADOREI})
 CT_PROJECT_CMAKELISTS_BASIC_SCRIPT()
-
 "
 		)
 	endif()
 endfunction()
 
 function(CT_PROJECT_CMAKELISTS_BASIC_SCRIPT)
-	CT_LOG_WRITELINE_NEWLINE()
-	CT_LOG_WRITELINE_PARTITION()
-	CT_CHECK_VARIABLE(CT_PROJECT_CONST_NAME)
-	CT_LOG_WRITELINE("ProjectName:")
-	CT_LOG_WRITELINE(${CT_PROJECT_CONST_NAME})
-	CT_CHECK_VARIABLE(CT_PROJECT_CONST_PATH)
-	CT_LOG_WRITELINE("ProjectPath:")
-	CT_LOG_WRITELINE(${CT_PROJECT_CONST_PATH})
-	CT_LOG_WRITELINE("Project Type:")
-	CT_LOG_WRITELINE(${CT_PROJECT_TYPE})
-	CT_CHECK_VARIABLE(CT_PROJECT_LANGUAGE)
-	CT_LOG_WRITELINE("Language:")
-	CT_LOG_WRITELINE(${CT_PROJECT_LANGUAGE})
-	CT_CHECK_VARIABLE(CT_PROJECT_PROC_MODE)
-	CT_LOG_WRITELINE("Mode:")
-	CT_LOG_WRITELINE(${CT_PROJECT_PROC_MODE})
-	CT_LOG_WRITELINE_PARTITION()
-
 	if(${CT_PROJECT_PROC_MODE} STREQUAL "DISABLE")
+		CT_LOG_WRITELINE_PARTITION()
+		CT_CHECK_VARIABLE(CT_PROJECT_CONST_NAME)
+		CT_LOG_WRITELINE("ProjectName: ${CT_PROJECT_CONST_NAME}")
+		CT_CHECK_VARIABLE(CT_PROJECT_CONST_PATH)
+		CT_LOG_WRITELINE("ProjectPath: ${CT_PROJECT_CONST_PATH}")
+		CT_CHECK_VARIABLE(CT_PROJECT_PROC_MODE)
+		CT_LOG_WRITELINE("Mode: ${CT_PROJECT_PROC_MODE}")
+		CT_LOG_WRITELINE_PARTITION()
 		return()
+	else()
+		CT_MODE_CHECK("LIB")
+		CT_LOG_WRITELINE_NEWLINE()
+		CT_LOG_WRITELINE_PARTITION()
+		CT_CHECK_VARIABLE(CT_PROJECT_CONST_NAME)
+		CT_LOG_WRITELINE("ProjectName: ${CT_PROJECT_CONST_NAME}")
+		CT_CHECK_VARIABLE(CT_PROJECT_CONST_PATH)
+		CT_LOG_WRITELINE("ProjectPath: ${CT_PROJECT_CONST_PATH}")
+		CT_LOG_WRITELINE("Project Type: ${CT_PROJECT_TYPE}")
+		CT_CHECK_VARIABLE(CT_PROJECT_LANGUAGE)
+		CT_LOG_WRITELINE("Language: ${CT_PROJECT_LANGUAGE}")
+		CT_CHECK_VARIABLE(CT_PROJECT_PROC_MODE)
+		CT_LOG_WRITELINE("Mode: ${CT_PROJECT_PROC_MODE}")
+		CT_LOG_WRITELINE_PARTITION()
 	endif()
 
 	if(${CT_PROJECT_PROC_MODE} STREQUAL "PLUGIN" OR ${CT_PROJECT_PROC_MODE} STREQUAL "ENABLE")
@@ -470,38 +552,48 @@ function(CT_PROJECT_CMAKELISTS_BASIC_SCRIPT)
 
 		if(CT_PROJECT_PRE_CMAKESCRIPTS)
 			CT_LOG_WRITELINE_PARTITION()
-			CT_LOG_WRITELINE_INNER_NEWLINE()
 			CT_LOG_WRITELINE("Script file to run before the build script block")
-			CT_LOG_WRITELINE_INNER_NEWLINE()
 			CT_LOG_WRITELINE_THIN_PARTITION()
 			CT_LOG_WRITELINE_LIST(CT_PROJECT_PRE_CMAKESCRIPTS FALSE)
 			CT_LOG_WRITELINE_PARTITION()
 
 			foreach(sc ${CT_PROJECT_PRE_CMAKESCRIPTS})
-				include("${CT_CONST_SEPCDIR_NAME_CMK}/${sc}")
+				if(EXISTS "${CT_CONST_ROOT_PATH_CMAKEGLOBALS_SOURCE}/${sc}")
+					include("${CT_CONST_ROOT_PATH_CMAKEGLOBALS_SOURCE}/${sc}")
+				else()
+					include("${CT_CONST_SEPCDIR_NAME_CMK}/${sc}")
+				endif()
 			endforeach()
 		endif()
 
 		if(${CT_PROJECT_PROC_MODE} STREQUAL "ENABLE")
-			if(CT_PROJECT_CODEFILES)
+			if(CT_PROJECT_FIND_PACKAGES)
 				CT_LOG_WRITELINE_PARTITION()
-				CT_LOG_WRITELINE_INNER_NEWLINE()
-				CT_LOG_WRITELINE("sources")
-				CT_LOG_WRITELINE_INNER_NEWLINE()
+				CT_LOG_WRITELINE("find packages")
 				CT_LOG_WRITELINE_THIN_PARTITION()
-				CT_LOG_WRITELINE_LIST(CT_PROJECT_CODEFILES FALSE)
+				CT_LOG_WRITELINE_LIST(CT_PROJECT_FIND_PACKAGES FALSE)
 				CT_LOG_WRITELINE_PARTITION()
+				find_package(${CT_PROJECT_FIND_PACKAGES} REQUIRED)
 			endif()
 
 			CT_CHECK_VARIABLE(CT_PROJECT_CODEFILES)
 			set(_TEMP_)
 
 			foreach(item ${CT_PROJECT_CODEFILES})
-				list(APPEND _TEMP_ "${CT_PROJECT_CONST_PATH}/${CT_CONST_SEPCDIR_NAME_SRC}/${item}")
+				list(APPEND _TEMP_ "${CT_CONST_SEPCDIR_NAME_SRC}/${item}")
 			endforeach()
 
 			set(CT_PROJECT_CODEFILES ${_TEMP_})
 			set(_TEMP_)
+
+			if(CT_PROJECT_CODEFILES)
+				CT_LOG_WRITELINE_PARTITION()
+				CT_LOG_WRITELINE("sources")
+				CT_LOG_WRITELINE_THIN_PARTITION()
+				CT_LOG_WRITELINE_LIST(CT_PROJECT_CODEFILES FALSE)
+				CT_LOG_WRITELINE_PARTITION()
+			endif()
+
 			list(POP_FRONT CT_PROJECT_CODEFILES _TEMP_)
 
 			if(${CT_PROJECT_TYPE} STREQUAL "EXE")
@@ -520,22 +612,9 @@ function(CT_PROJECT_CMAKELISTS_BASIC_SCRIPT)
 
 			unset(_TEMP_)
 
-			if(CT_PROJECT_FIND_PACKAGES)
-				CT_LOG_WRITELINE_PARTITION()
-				CT_LOG_WRITELINE_INNER_NEWLINE()
-				CT_LOG_WRITELINE("find packages")
-				CT_LOG_WRITELINE_INNER_NEWLINE()
-				CT_LOG_WRITELINE_THIN_PARTITION()
-				CT_LOG_WRITELINE_LIST(CT_PROJECT_FIND_PACKAGES FALSE)
-				CT_LOG_WRITELINE_PARTITION()
-				find_package(${CT_PROJECT_FIND_PACKAGES} REQUIRED)
-			endif()
-
 			if(CT_PROJECT_COMPILE_DEFINITIONS)
 				CT_LOG_WRITELINE_PARTITION()
-				CT_LOG_WRITELINE_INNER_NEWLINE()
 				CT_LOG_WRITELINE("compile definitions")
-				CT_LOG_WRITELINE_INNER_NEWLINE()
 				CT_LOG_WRITELINE_THIN_PARTITION()
 				CT_LOG_WRITELINE_LIST(CT_PROJECT_COMPILE_DEFINITIONS FALSE)
 				CT_LOG_WRITELINE_PARTITION()
@@ -544,9 +623,7 @@ function(CT_PROJECT_CMAKELISTS_BASIC_SCRIPT)
 
 			if(CT_PROJECT_COMPILE_FEATURES)
 				CT_LOG_WRITELINE_PARTITION()
-				CT_LOG_WRITELINE_INNER_NEWLINE()
 				CT_LOG_WRITELINE("compile features")
-				CT_LOG_WRITELINE_INNER_NEWLINE()
 				CT_LOG_WRITELINE_THIN_PARTITION()
 				CT_LOG_WRITELINE_LIST(CT_PROJECT_COMPILE_FEATURES FALSE)
 				CT_LOG_WRITELINE_PARTITION()
@@ -555,9 +632,7 @@ function(CT_PROJECT_CMAKELISTS_BASIC_SCRIPT)
 
 			if(CT_PROJECT_COMPILE_OPTIONS)
 				CT_LOG_WRITELINE_PARTITION()
-				CT_LOG_WRITELINE_INNER_NEWLINE()
 				CT_LOG_WRITELINE("compile options")
-				CT_LOG_WRITELINE_INNER_NEWLINE()
 				CT_LOG_WRITELINE_THIN_PARTITION()
 				CT_LOG_WRITELINE_LIST(CT_PROJECT_COMPILE_OPTIONS FALSE)
 				CT_LOG_WRITELINE_PARTITION()
@@ -566,31 +641,25 @@ function(CT_PROJECT_CMAKELISTS_BASIC_SCRIPT)
 
 			if(CT_PROJECT_INCLUDE_DIRECTORIES)
 				CT_LOG_WRITELINE_PARTITION()
-				CT_LOG_WRITELINE_INNER_NEWLINE()
 				CT_LOG_WRITELINE("include directories")
-				CT_LOG_WRITELINE_INNER_NEWLINE()
 				CT_LOG_WRITELINE_THIN_PARTITION()
-				CT_LOG_WRITELINE_LIST(CT_PROJECT_INCLUDE_DIRECTORIES FALSE)
+				CT_LOG_WRITELINE_LIST(CT_PROJECT_INCLUDE_DIRECTORIES TRUE)
 				CT_LOG_WRITELINE_PARTITION()
 				target_include_directories(${CT_PROJECT_CONST_NAME} PRIVATE ${CT_PROJECT_INCLUDE_DIRECTORIES})
 			endif()
 
 			if(CT_PROJECT_LINK_DIRECTORIES)
 				CT_LOG_WRITELINE_PARTITION()
-				CT_LOG_WRITELINE_INNER_NEWLINE()
 				CT_LOG_WRITELINE("Directories with linked libraries")
-				CT_LOG_WRITELINE_INNER_NEWLINE()
 				CT_LOG_WRITELINE_THIN_PARTITION()
-				CT_LOG_WRITELINE_LIST(CT_PROJECT_LINK_DIRECTORIES FALSE)
+				CT_LOG_WRITELINE_LIST(CT_PROJECT_LINK_DIRECTORIES TRUE)
 				CT_LOG_WRITELINE_PARTITION()
 				target_link_directories(${CT_PROJECT_CONST_NAME} PRIVATE ${CT_PROJECT_LINK_DIRECTORIES})
 			endif()
 
 			if(CT_PROJECT_LINK_LIBRARIES)
 				CT_LOG_WRITELINE_PARTITION()
-				CT_LOG_WRITELINE_INNER_NEWLINE()
 				CT_LOG_WRITELINE("link libraries")
-				CT_LOG_WRITELINE_INNER_NEWLINE()
 				CT_LOG_WRITELINE_THIN_PARTITION()
 				CT_LOG_WRITELINE_LIST(CT_PROJECT_LINK_LIBRARIES FALSE)
 				CT_LOG_WRITELINE_PARTITION()
@@ -599,9 +668,7 @@ function(CT_PROJECT_CMAKELISTS_BASIC_SCRIPT)
 
 			if(CT_PROJECT_LINK_OPTIONS)
 				CT_LOG_WRITELINE_PARTITION()
-				CT_LOG_WRITELINE_INNER_NEWLINE()
 				CT_LOG_WRITELINE("link options")
-				CT_LOG_WRITELINE_INNER_NEWLINE()
 				CT_LOG_WRITELINE_THIN_PARTITION()
 				CT_LOG_WRITELINE_LIST(CT_PROJECT_LINK_OPTIONS FALSE)
 				CT_LOG_WRITELINE_PARTITION()
@@ -610,89 +677,110 @@ function(CT_PROJECT_CMAKELISTS_BASIC_SCRIPT)
 
 			if(CT_PRECOMPILE_HEADERS)
 				CT_LOG_WRITELINE_PARTITION()
-				CT_LOG_WRITELINE_INNER_NEWLINE()
 				CT_LOG_WRITELINE("precompilation headers")
-				CT_LOG_WRITELINE_INNER_NEWLINE()
 				CT_LOG_WRITELINE_THIN_PARTITION()
 				CT_LOG_WRITELINE_LIST(CT_PRECOMPILE_HEADERS FALSE)
 				CT_LOG_WRITELINE_PARTITION()
 				target_precompile_headers(${CT_PROJECT_CONST_NAME} PRIVATE ${CT_PRECOMPILE_HEADERS})
 			endif()
 		else()
-			add_custom_target(${CT_PROJECT_CONST_NAME})
+			foreach(sc ${CT_PROJECT_BUILD_SCRIPTS})
+				if(EXISTS "${CT_CONST_ROOT_PATH_CMAKEGLOBALS_SOURCE}/${sc}")
+					include("${CT_CONST_ROOT_PATH_CMAKEGLOBALS_SOURCE}/${sc}")
+				else()
+					include("${CT_CONST_SEPCDIR_NAME_CMK}/${sc}")
+				endif()
+			endforeach()
+
+			if(NOT TARGET ${CT_PROJECT_CONST_NAME})
+				add_custom_target(${CT_PROJECT_CONST_NAME})
+			endif()
 		endif()
 
 		CT_LOG_WRITELINE_PARTITION()
-		CT_LOG_WRITELINE_INNER_NEWLINE()
 		CT_LOG_WRITELINE("dependencies. before building the project. What to do and which projects to build first")
-		CT_LOG_WRITELINE_INNER_NEWLINE()
 		CT_LOG_WRITELINE_THIN_PARTITION()
-		CT_LOG_WRITELINE_LIST(CT_PROJECT_BUILD_PRE_CMAKESCRIPTS FALSE)
-		CT_LOG_WRITELINE_INNER_NEWLINE()
-		CT_LOG_WRITELINE_LIST(CT_PROJECT_DEPENDENCIES FALSE)
-		CT_LOG_WRITELINE_INNER_NEWLINE()
-		CT_LOG_WRITELINE_LIST(CT_PROJECT_BUILD_POST_CMAKESCRIPTS FALSE)
+		CT_LOG_WRITELINE_LIST(CT_PROJECT_BUILD_PRE_CMAKESCRIPTS TRUE)
+		CT_LOG_WRITELINE_LIST(CT_PROJECT_BUILD_POST_CMAKESCRIPTS TRUE)
 		CT_LOG_WRITELINE_PARTITION()
 
 		foreach(sc ${CT_PROJECT_BUILD_PRE_CMAKESCRIPTS})
+			set(path "")
+
+			if(EXISTS "${CT_CONST_ROOT_PATH_CMAKEGLOBALS_SOURCE}/${sc}")
+				set(path "${CT_CONST_ROOT_PATH_CMAKEGLOBALS_SOURCE}/${sc}")
+			else()
+				set(path "${CT_PROJECT_CONST_PATH}/${CT_CONST_SEPCDIR_NAME_CMK}/${sc}")
+			endif()
+
 			add_custom_target(pre_build_target
 				COMMENT "Pre-build target"
 				PRE_BUILD
-				COMMAND ${CMAKE_COMMAND} -P ${CT_PROJECT_CONST_PATH}/${CT_CONST_SEPCDIR_NAME_CMK}/${sc}
+				COMMAND ${CMAKE_COMMAND} -P ${path}
 				WORKING_DIRECTORY ${CT_PROJECT_CONST_PATH}
 			)
 			add_dependencies(${CT_PROJECT_CONST_NAME} pre_build_target)
 		endforeach()
 
-		if(CT_PROJECT_DEPENDENCIES)
-			add_definitions(${CT_PROJECT_CONST_NAME} ${CT_PROJECT_DEPENDENCIES})
-		endif()
-
 		foreach(sc ${CT_PROJECT_BUILD_POST_CMAKESCRIPTS})
+			set(path "")
+
+			if(EXISTS "${CT_CONST_ROOT_PATH_CMAKEGLOBALS_SOURCE}/${sc}")
+				set(path "${CT_CONST_ROOT_PATH_CMAKEGLOBALS_SOURCE}/${sc}")
+			else()
+				set(path "${CT_PROJECT_CONST_PATH}/${CT_CONST_SEPCDIR_NAME_CMK}/${sc}")
+			endif()
+
 			add_custom_target(post_build_target
 				COMMENT "Post-build target"
 				POST_BUILD
-				COMMAND ${CMAKE_COMMAND} -P ${CT_PROJECT_CONST_PATH}/${CT_CONST_SEPCDIR_NAME_CMK}/${sc}
+				COMMAND ${CMAKE_COMMAND} -P ${path}
 				WORKING_DIRECTORY ${CT_PROJECT_CONST_PATH}
 			)
 			add_dependencies(${CT_PROJECT_CONST_NAME} post_build_target)
 		endforeach()
 
 		CT_LOG_WRITELINE_PARTITION()
-		CT_LOG_WRITELINE_INNER_NEWLINE()
 		CT_LOG_WRITELINE("Script files to be executed after the build script block")
-		CT_LOG_WRITELINE_INNER_NEWLINE()
 		CT_LOG_WRITELINE_THIN_PARTITION()
 		CT_LOG_WRITELINE_LIST(CT_PROJECT_POST_CMAKESCRIPTS FALSE)
 		CT_LOG_WRITELINE_PARTITION()
 
 		foreach(sc ${CT_PROJECT_POST_CMAKESCRIPTS})
-			include("${CT_CONST_SEPCDIR_NAME_CMK}/${sc}")
+			if(EXISTS "${CT_CONST_ROOT_PATH_CMAKEGLOBALS_SOURCE}/${sc}")
+				include("${CT_CONST_ROOT_PATH_CMAKEGLOBALS_SOURCE}/${sc}")
+			else()
+				include("${CT_CONST_SEPCDIR_NAME_CMK}/${sc}")
+			endif()
 		endforeach()
 
 		CT_LOG_WRITELINE_NEWLINE()
 	endif()
 endfunction()
 
-function(CT_MAKE_CMAKEENVSETTINGS)
-	if(NOT EXISTS ${CT_CONST_ROOT_PATH_CMAKEENVSETTINGS})
-		CT_WRITE_TEXTFILE(${CT_CONST_ROOT_PATH_CMAKEENVSETTINGS}
+function(CT_MAKE_CMAKEPRESETS)
+	CT_MODE_CHECK("ROOT;SETUP")
+
+	if(NOT EXISTS ${CT_CONST_ROOT_PATH_CMAKEPRESETS})
+		CT_WRITE_TEXTFILE(${CT_CONST_ROOT_PATH_CMAKEPRESETS}
 			"# \"https://github.com/TANAKADOREI/CMakeTemplate\"
-# If your IDE supports Cmake
-set(CT_IDE_MODE TRUE)
+# Files executed before the `project()` command in the root `cmakelists` file
 "
 		)
 	endif()
 endfunction()
 
-# Root CMakeLists.txt fileをつくる
+#
 function(CT_MAKE_ROOTCMAKELISTS)
-	if(NOT EXISTS ${CT_CONST_ROOT_PATH_CMAKELISTS})
-		CT_WRITE_TEXTFILE(${CT_CONST_ROOT_PATH_CMAKELISTS}
-			"# \"https://github.com/TANAKADOREI/CMakeTemplate\"
+	CT_MODE_CHECK("ROOT;SETUP")
+	CT_WRITE_TEXTFILE(${CT_CONST_ROOT_PATH_CMAKELISTS}
+		"# \"https://github.com/TANAKADOREI/CMakeTemplate\"
 # Only edit the `project` command, don't edit the rest
 #
 cmake_minimum_required(VERSION ${CT_CONST_CMAKE_VERSION})
+
+include(\"${CT_CONST_ROOT_PATH_CMAKEPRESETS}\")
+
 project(
 	\"CMAKETEMPLATEBYTANAKADOREI\"
 	VERSION
@@ -701,59 +789,20 @@ project(
 	\"https://github.com/TANAKADOREI/CMakeTemplate\"
 )
 message(\"[${CT_CONST_ROOT_NAME_CMAKELISTS}]:\")
+set(CT_MODE \"ROOT\")
 include(\"${CT_CONST_ROOT_NAME_CMAKETEMPLATEBYTANAKADOREI}\")
 message(\":[${CT_CONST_ROOT_NAME_CMAKELISTS}]\")
 "
-		)
-	endif()
-endfunction()
-
-# IDE_MODEがFALSEとき使用できるScript
-function(CT_MAKE_CMAKEROOTLISTSEXECUTOR)
-	if(NOT EXISTS ${CT_CONST_ROOT_PATH_CMAKEROOTLISTSEXECUTOR})
-		CT_WRITE_TEXTFILE(${CT_CONST_ROOT_PATH_CMAKEROOTLISTSEXECUTOR}
-			"# \"https://github.com/TANAKADOREI/CMakeTemplate\"
-# Only the command line part of the `execute_process` part can be modified.
-#
-cmake_minimum_required(VERSION ${CT_CONST_CMAKE_VERSION})
-
-message(\"[${CT_CONST_ROOT_NAME_CMAKEROOTLISTSEXECUTOR}]:\")
-
-include(\"${CT_CONST_ROOT_NAME_CMAKEROOT}\")
-include(\"${CT_CONST_ROOT_NAME_CMAKEENVSETTINGS}\")
-
-set(output)
-
-if(NOT CT_IDE_MODE)
-
-execute_process(
-COMMAND
-# [editable part]
-# ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-\${CMAKE_COMMAND} \${CT_CONST_ROOT_DIR_PATH} -B \${CT_CONST_ROOT_DIR_PATH}/CMakeTemplateOutput -Wno-dev
-# └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-OUTPUT_VARIABLE output
-)
-message(\${output})
-
-else()
-
-message(\"This script file cannot be used when `CT_IDE_MODE` of `CMakeENVSettings.cmake` is true.\")
-
-endif()
-message(\":[${CT_CONST_ROOT_NAME_CMAKEROOTLISTSEXECUTOR}]\")
-"
-		)
-	endif()
+	)
 endfunction()
 
 function(CT_MAKE_CMAKEPROJECTS)
+	CT_MODE_CHECK("ROOT;SETUP")
+
 	if(NOT EXISTS ${CT_CONST_ROOT_PATH_CMAKEPROJECTS})
 		CT_WRITE_TEXTFILE(${CT_CONST_ROOT_PATH_CMAKEPROJECTS}
 			"# \"https://github.com/TANAKADOREI/CMakeTemplate\"
 # Add your project name to `CT_PROJECTS`(list) variable
-# Names in `CT_PROJECTS` are compared with the project directory, and names not in `CT_PROJECTS` are removed. (Warning)
-# Project directories are prefixed with `${CT_CONST_PROJECT_DIR_PREFIX}`. Be careful when creating new directories
 #
 
 set(CT_PROJECTS
@@ -764,25 +813,46 @@ set(CT_PROJECTS
 	endif()
 endfunction()
 
-# [Root `CMakeLists.txt` logic]
-# ┌────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-if(DEFINED CT_THIS_SCRIPTFILE_IS_ROOTDIR)
-	unset(CT_THIS_SCRIPTFILE_IS_ROOTDIR)
+function(CT_MAKE_CMAKEDEPENDENCIES)
+	CT_MODE_CHECK("ROOT;SETUP")
 
+	if(NOT EXISTS ${CT_CONST_ROOT_PATH_CMAKEDEPENDENCIES})
+		CT_WRITE_TEXTFILE(${CT_CONST_ROOT_PATH_CMAKEDEPENDENCIES}
+			"# \"https://github.com/TANAKADOREI/CMakeTemplate\"
+# This is a file that sets up project dependencies.
+#
+
+# add_dependencies()
+"
+		)
+	endif()
+endfunction()
+
+if(${CT_MODE} STREQUAL "ROOT" OR ${CT_MODE} STREQUAL "SETUP")
+	CT_LOG_WRITELINE_PARTITION()
+	CT_LOG_WRITELINE("The current target system is `${CT_CURRENT_SYSTEM}`")
+	CT_LOG_WRITELINE_PARTITION()
+	CT_LOG_VERIFICATION_BEGIN(BUILD_ENV "Environment Configuration Validation" 4)
+	CT_MAKE_CMAKEPRESETS()
+	CT_LOG_VERIFICATION_UPDATE(BUILD_ENV "")
 	CT_MAKE_CMAKEPROJECTS()
+	CT_LOG_VERIFICATION_UPDATE(BUILD_ENV "")
 	CT_MAKE_ROOTCMAKELISTS()
-	CT_MAKE_CMAKEENVSETTINGS()
-	CT_MAKE_CMAKEROOTLISTSEXECUTOR()
+	CT_LOG_VERIFICATION_UPDATE(BUILD_ENV "")
+	CT_MAKE_CMAKEDEPENDENCIES()
+	CT_LOG_VERIFICATION_UPDATE(BUILD_ENV "")
+	CT_LOG_VERIFICATION_END(BUILD_ENV)
+	CT_LOG_WRITELINE_PARTITION()
+endif()
+
+if(${CT_MODE} STREQUAL "ROOT")
+	file(GLOB_RECURSE sc "${CT_CONST_ROOT_PATH_CMAKEGLOBALS_INJECT}/*.cmake")
+
+	foreach(s ${sc})
+		include(${s})
+	endforeach()
 
 	include(${CT_CONST_ROOT_PATH_CMAKEPROJECTS})
-
-	file(GLOB CTP_DIR_NAMES RELATIVE ${CT_CONST_ROOT_DIR_PATH} "${CT_CONST_PROJECT_DIR_PREFIX}*")
-
-	set(CT_DIR_PATH_LIST)
-
-	foreach(item ${CTP_DIR_NAMES})
-		list(APPEND CT_DIR_PATH_LIST "${CT_CONST_ROOT_DIR_PATH}/${item}")
-	endforeach()
 
 	set(CT_PROJECT_LIST)
 	set(CT_PROJECT_PATH_LIST)
@@ -790,7 +860,7 @@ if(DEFINED CT_THIS_SCRIPTFILE_IS_ROOTDIR)
 	foreach(project_name ${CT_PROJECTS})
 		CT_CHECK_NAME(${project_name})
 		list(APPEND CT_PROJECT_LIST ${project_name})
-		list(APPEND CT_PROJECT_PATH_LIST "${CT_CONST_ROOT_DIR_PATH}/${CT_CONST_PROJECT_DIR_PREFIX}${project_name}")
+		list(APPEND CT_PROJECT_PATH_LIST "${CT_CONST_ROOT_DIR_PATH}/${project_name}")
 	endforeach()
 
 	CT_LOG_WRITELINE_NEWLINE()
@@ -802,19 +872,14 @@ if(DEFINED CT_THIS_SCRIPTFILE_IS_ROOTDIR)
 	CT_LOG_WRITELINE_THIN_PARTITION()
 	CT_LOG_WRITELINE("path for each project")
 	CT_LOG_WRITELINE_LIST(CT_PROJECT_PATH_LIST TRUE)
-	CT_LOG_WRITELINE_THIN_PARTITION()
-	CT_LOG_WRITELINE("Project path found on the physical file system")
-	CT_LOG_WRITELINE_LIST(CT_DIR_PATH_LIST TRUE)
 	CT_LOG_WRITELINE_PARTITION()
 	CT_LOG_WRITELINE_NEWLINE()
 
 	CT_LOG_WRITELINE_PARTITION()
-	CT_LOG_WRITELINE("project cleanup")
+	CT_LOG_WRITELINE("projects")
 	CT_LOG_WRITELINE_THIN_PARTITION()
 
 	foreach(project_path ${CT_PROJECT_PATH_LIST})
-		list(FIND CT_DIR_PATH_LIST "${project_path}" INDEX)
-		set(project_name)
 		list(FIND CT_PROJECT_PATH_LIST "${project_path}" INDEX)
 		list(GET CT_PROJECT_LIST ${INDEX} project_name)
 
@@ -824,19 +889,7 @@ if(DEFINED CT_THIS_SCRIPTFILE_IS_ROOTDIR)
 			CT_LOG_WRITELINE("[Pass] ${project_path}")
 		endif()
 
-		CT_MAKE_PROJECTDIR("${CT_CONST_PROJECT_DIR_PREFIX}${project_name}" "${project_name}")
-	endforeach()
-
-	foreach(dir_path ${CT_DIR_PATH_LIST})
-		list(FIND CT_PROJECT_PATH_LIST "${dir_path}" INDEX)
-
-		if(${INDEX} EQUAL -1)
-			CT_LOG_WRITELINE("[Delete] ${dir_path}")
-
-			file(REMOVE_RECURSE ${dir_path})
-		else()
-			# CT_LOG_WRITELINE("[Pass] ${dir_path}")
-		endif()
+		CT_MAKE_PROJECTDIR("${project_name}")
 	endforeach()
 
 	CT_LOG_WRITELINE_PARTITION()
@@ -844,6 +897,8 @@ if(DEFINED CT_THIS_SCRIPTFILE_IS_ROOTDIR)
 	foreach(project_path ${CT_PROJECT_PATH_LIST})
 		add_subdirectory(${project_path})
 	endforeach()
+
+	include(${CT_CONST_ROOT_PATH_CMAKEDEPENDENCIES})
 endif()
 
 # └────────────────────────────────────────────────────────────────────────────────────────────────────────┘
